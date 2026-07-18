@@ -1,1501 +1,313 @@
 <!doctype html>
 <html lang="th">
-  <head>
-    <base target="_top">
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fleet Fuel Claim</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <style>
-:root{
-  --bg:#f4f6f8;
-  --surface:#fff;
-  --surface-2:#f8fbfb;
-  --ink:#17211f;
-  --muted:#64706f;
-  --line:#dbe5e2;
-  --brand:#0f766e;
-  --brand-2:#0b5f59;
-  --accent:#f59e0b;
-  --info:#3159a4;
-  --danger:#dc2626;
-  --shadow:0 16px 36px rgba(22,33,31,.08);
-}
-*{box-sizing:border-box}
-body{margin:0;min-height:100vh;font-family:"Noto Sans Thai",system-ui,sans-serif;background:var(--bg);color:var(--ink)}
-button,input,select,textarea{font:inherit}
-button{cursor:pointer}
-h1,h2,h3,p{margin-top:0}
-h1{margin-bottom:0;font-size:clamp(26px,3vw,38px);line-height:1.15;letter-spacing:0}
-h2{margin-bottom:2px;font-size:20px}
-small{color:var(--muted)}
-.app-shell{display:grid;grid-template-columns:280px minmax(0,1fr);min-height:100vh}
-.sidebar{position:sticky;top:0;height:100vh;display:flex;flex-direction:column;gap:24px;padding:26px 18px;background:#111c1a;color:#fff}
-.brand{display:flex;align-items:center;gap:12px;padding:0 6px}
-.brand-mark{display:grid;place-items:center;width:44px;height:44px;border-radius:8px;background:var(--accent);color:#211506;font-weight:800}
-.brand strong,.brand span{display:block}
-.brand span,.side-summary small,.side-summary span{color:rgba(255,255,255,.66)}
-.nav-list{display:grid;gap:8px}
-.nav-item{display:flex;align-items:center;gap:12px;width:100%;min-height:46px;padding:10px 12px;border:0;border-radius:8px;background:transparent;color:rgba(255,255,255,.78);text-align:left}
-.nav-item span{display:grid;place-items:center;width:24px;height:24px;font-weight:800}
-.nav-item.active,.nav-item:hover{background:rgba(255,255,255,.1);color:#fff}
-.side-summary{margin-top:auto;padding:18px;border:1px solid rgba(255,255,255,.12);border-radius:8px;background:rgba(255,255,255,.06)}
-.side-summary strong{display:block;margin:10px 0 4px;font-size:28px}
-.main{min-width:0;padding:30px}
-.topbar{display:flex;align-items:center;justify-content:space-between;gap:18px;margin-bottom:18px}
-.eyebrow{margin:0 0 4px;color:var(--brand);font-weight:800}
-.top-actions,.filters,.segmented,.form-actions{display:flex;align-items:center;gap:10px}
-select,input,textarea{width:100%;border:1px solid var(--line);border-radius:8px;background:#fff;color:var(--ink);padding:11px 12px;outline:none}
-textarea{resize:vertical}
-select:focus,input:focus,textarea:focus{border-color:var(--brand);box-shadow:0 0 0 3px rgba(15,118,110,.13)}
-.primary-btn,.ghost-btn,.segmented button{min-height:42px;border-radius:8px;border:1px solid transparent;padding:9px 14px;font-weight:800;white-space:nowrap}
-.primary-btn{background:var(--brand);color:#fff}
-.primary-btn:hover{background:var(--brand-2)}
-.ghost-btn{border-color:var(--line);background:#fff;color:var(--ink)}
-.notice{display:none;margin-bottom:16px;padding:12px 14px;border-radius:8px;background:#fff3d6;color:#7a4b00;font-weight:800}
-.notice.show{display:block}
-.notice.ok{background:#e6f4f1;color:var(--brand-2)}
-.notice.error{background:#fee2e2;color:#991b1b}
-.view{display:none}
-.view.active{display:block}
-.panel,.metric{border:1px solid var(--line);border-radius:8px;background:var(--surface);box-shadow:var(--shadow)}
-.panel{padding:20px}
-.panel-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:16px}
-.panel-head p{margin-bottom:0;color:var(--muted)}
-.kpi-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:16px;margin-bottom:16px}
-.metric{padding:18px}
-.metric span,.metric small,.panel label{color:var(--muted)}
-.metric strong{display:block;margin:8px 0 2px;font-size:28px;line-height:1.1}
-.metric.compact strong{font-size:22px}
-.metric.alert strong{color:var(--danger)}
-.content-grid{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(320px,.8fr);gap:16px}
-.segmented{padding:4px;border-radius:8px;background:#eef4f3}
-.segmented button{min-height:34px;border:0;background:transparent;color:var(--muted)}
-.segmented button.active{background:#fff;color:var(--brand);box-shadow:0 2px 10px rgba(20,33,31,.08)}
-.vehicle-list,.maintenance-list,.driver-list,.car-cards,.single-car-dashboard,.report-list{display:grid;gap:12px}
-.vehicle-row,.maintenance-item,.driver-item,.car-card,.next-card,.budget-card,.single-car-card,.claim-timeline-row,.report-card{border:1px solid var(--line);border-radius:8px;background:#fff;padding:14px}
-.vehicle-row{display:grid;grid-template-columns:1fr 140px 140px 120px;align-items:center;gap:12px}
-.badge{display:inline-flex;align-items:center;min-height:28px;padding:4px 9px;border-radius:999px;background:#e6f4f1;color:var(--brand-2);font-size:13px;font-weight:800}
-.badge.warn{background:#fff3d6;color:#9a5b00}
-.claim-form{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
-.claim-form.compact{margin-bottom:18px}
-.stack-form{display:grid;gap:12px;margin-bottom:18px}
-label{display:grid;gap:6px;font-weight:800}
-.full{grid-column:1/-1}
-.upload-box{min-height:112px;align-content:center;border:1px dashed #b7c6c3;border-radius:8px;background:var(--surface-2);padding:14px}
-.upload-box input{padding:0;border:0;box-shadow:none}
-.upload-box span{color:var(--muted);font-size:13px}
-.claim-assistant,.inline-summary,.budget-alert{display:none;margin-bottom:14px;border:1px solid var(--line);border-radius:8px;background:var(--surface-2);padding:12px 14px}
-.claim-assistant{display:block}
-.claim-assistant div{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
-.claim-assistant span{padding:5px 9px;border-radius:999px;background:#eef4f3;color:var(--muted);font-size:13px;font-weight:700}
-.claim-assistant.warn{border-color:#f8c7c7;background:#fff7f7}
-.claim-assistant.warn p{margin:8px 0 0;color:var(--danger);font-weight:800}
-.inline-summary{display:flex;align-items:center;gap:12px;justify-content:space-between}
-.budget-alert.show{display:grid;gap:2px;border-color:#fecaca;background:#fff7f7;color:#991b1b}
-.budget-panel,.car-dashboard-panel{margin-top:16px}
-.budget-form{display:grid;grid-template-columns:1fr repeat(2,minmax(0,1fr)) auto;gap:12px;align-items:end;margin-bottom:14px}
-.budget-scope{border:1px solid var(--line);border-radius:8px;background:var(--surface-2);padding:10px 12px}
-.budget-scope small{display:block;color:var(--muted)}
-.budget-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
-.budget-card strong{display:block;font-size:24px}
-.budget-card.over-limit{border-color:#fecaca;background:#fffafa}
-.budget-progress,.distance-bar{height:10px;border-radius:999px;background:#e7eeec;overflow:hidden;margin:12px 0}
-.budget-progress span,.distance-bar span{display:block;height:100%;border-radius:inherit;background:var(--brand)}
-.budget-card.over-limit .budget-progress span{background:var(--danger)}
-.budget-values{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.budget-values .over{color:var(--danger)}
-.filter-grid{display:grid;grid-template-columns:minmax(220px,1.3fr) minmax(180px,.8fr) minmax(170px,.7fr) minmax(170px,.7fr);gap:12px;align-items:end;margin-bottom:14px}
-.filter-grid.compact{grid-template-columns:220px minmax(220px,320px)}
-.range-fields{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.is-hidden{display:none!important}
-.table-wrap{overflow-x:auto}
-table{width:100%;border-collapse:collapse;min-width:980px}
-th,td{padding:13px 10px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
-th{color:var(--muted);font-size:13px}
-.empty-state{padding:18px;color:var(--muted);text-align:center}
-.doc-links{display:grid;gap:4px}
-.doc-links a{color:var(--brand-2);font-weight:800;text-decoration:none}
-.action-buttons{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
-.mini-btn{min-height:32px;border-radius:8px;border:1px solid var(--line);background:#fff;color:var(--ink);padding:5px 9px;font-weight:800}
-.mini-btn.danger{border-color:#fecaca;color:#991b1b;background:#fff5f5}
-.car-card{display:grid;grid-template-columns:92px 1fr;gap:14px;align-items:center}
-.car-image{width:92px;aspect-ratio:4/3;border-radius:8px;background:linear-gradient(135deg,rgba(15,118,110,.85),rgba(245,158,11,.82))}
-.car-image img{width:100%;height:100%;object-fit:cover;border-radius:8px}
-.next-card strong{display:block;margin:8px 0;font-size:34px}
-.next-card .bar{height:10px;overflow:hidden;border-radius:999px;background:#e7eeec}
-.next-card .bar span{display:block;height:100%;border-radius:inherit;background:var(--brand)}
-.single-car-card{display:grid;grid-template-columns:1.4fr repeat(3,1fr);gap:12px;align-items:center}
-.single-car-head{display:flex;justify-content:space-between;gap:16px;margin-bottom:14px}
-.single-car-head h3{margin:8px 0 2px;font-size:24px}
-.single-car-stats{display:grid;grid-template-columns:repeat(3,minmax(120px,1fr));gap:10px}
-.single-car-stats div{border:1px solid var(--line);border-radius:8px;padding:12px;background:var(--surface-2)}
-.single-car-stats strong{display:block;font-size:20px}
-.claim-timeline{display:grid;gap:10px}
-.claim-timeline-row{display:grid;grid-template-columns:1fr minmax(140px,.8fr) 140px;gap:12px;align-items:center}
-.timeline-values{text-align:right}
-.report-summary{margin-top:4px}
-.report-card{display:grid;grid-template-columns:1.2fr repeat(3,1fr);gap:12px;align-items:center}
-.calendar-grid{display:grid;grid-template-columns:repeat(7,minmax(120px,1fr));gap:8px}
-.calendar-weekday{padding:8px;color:var(--muted);font-weight:800;text-align:center}
-.calendar-day{min-height:132px;border:1px solid var(--line);border-radius:8px;background:#fff;padding:10px;display:grid;align-content:start;gap:7px}
-.calendar-day.muted{background:transparent;border-color:transparent}
-.calendar-day>strong{font-size:18px}
-.calendar-event{display:grid;gap:2px;border-left:3px solid var(--brand);border-radius:6px;background:#eef8f6;padding:6px 7px;color:#27423f;font-size:12px;line-height:1.25}
-.calendar-event.service{border-left-color:var(--accent);background:#fff6df;color:#5b3b00}
-@media(max-width:1180px){
-  .app-shell{grid-template-columns:1fr}
-  .sidebar{position:static;height:auto}
-  .nav-list{grid-template-columns:repeat(auto-fit,minmax(130px,1fr))}
-  .side-summary{display:none}
-  .kpi-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
-  .claim-form,.content-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
-  .filter-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
-  .calendar-grid{grid-template-columns:repeat(7,minmax(96px,1fr))}
-}
-@media(max-width:760px){
-  .main{padding:18px}
-  .topbar,.panel-head,.top-actions,.filters,.filter-grid,.filter-grid.compact,.range-fields,.budget-form,.budget-grid,.single-car-card,.single-car-head,.single-car-stats,.claim-timeline-row,.report-card{display:grid;grid-template-columns:1fr}
-  .nav-list,.kpi-grid,.claim-form,.content-grid,.vehicle-row{grid-template-columns:1fr}
-  .timeline-values{text-align:left}
-  .calendar-grid{grid-template-columns:1fr}
-  .calendar-weekday{display:none}
-}
-    </style>
-  </head>
-  <body>
-    <div class="app-shell">
-      <aside class="sidebar">
-        <div class="brand">
-          <div class="brand-mark">F</div>
-          <div>
-            <strong>Fleet Fuel</strong>
-            <span>ระบบเบิกค่าน้ำมัน</span>
-          </div>
-        </div>
-        <nav class="nav-list">
-          <button class="nav-item active" data-view="dashboard"><span>⌂</span>แดชบอร์ด</button>
-          <button class="nav-item" data-view="claim"><span>＋</span>บันทึกเบิก</button>
-          <button class="nav-item" data-view="history"><span>▤</span>ประวัติ</button>
-          <button class="nav-item" data-view="report"><span>◫</span>รายงานเดือน</button>
-          <button class="nav-item" data-view="calendar"><span>□</span>ปฏิทิน</button>
-          <button class="nav-item" data-view="maintenance"><span>⚙</span>ซ่อมบำรุง</button>
-          <button class="nav-item" data-view="cars"><span>▣</span>รถและคนขับ</button>
-        </nav>
-        <div class="side-summary">
-          <span>รอบเบิกถัดไปโดยประมาณ</span>
-          <strong id="nextDistanceSummary">-</strong>
-          <small>อ้างอิงจากรายการล่าสุด</small>
-        </div>
-      </aside>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>Fleet Fuel Claim</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root{--bg:#f2f5f4;--card:#fff;--ink:#182321;--muted:#687572;--line:#dce5e3;--brand:#0f766e;--brand2:#0a5e58;--accent:#f59e0b;--danger:#c62828;--ok:#0f766e;--shadow:0 12px 32px rgba(20,42,38,.08)}
+    *{box-sizing:border-box}body{margin:0;min-height:100vh;background:var(--bg);color:var(--ink);font-family:"Noto Sans Thai",system-ui,sans-serif}button,input,select,textarea{font:inherit}button{cursor:pointer}h1,h2,h3,p{margin-top:0}h1{margin-bottom:0;font-size:clamp(25px,3vw,38px);line-height:1.2}h2{margin-bottom:2px;font-size:20px}small,.muted{color:var(--muted)}
+    .app{display:grid;grid-template-columns:270px minmax(0,1fr);min-height:100vh}.sidebar{position:sticky;top:0;height:100vh;padding:24px 18px;display:flex;flex-direction:column;gap:22px;background:#101c1a;color:#fff}.brand{display:flex;gap:12px;align-items:center;padding:0 6px}.brand-mark{display:grid;place-items:center;width:44px;height:44px;border-radius:10px;background:var(--accent);color:#2b1b03;font-size:22px;font-weight:900}.brand span{display:block;color:rgba(255,255,255,.65);font-size:13px}.nav{display:grid;gap:7px}.nav button{display:flex;align-items:center;gap:10px;min-height:46px;padding:10px 12px;border:0;border-radius:9px;background:transparent;color:rgba(255,255,255,.76);font-weight:700;text-align:left}.nav button:hover,.nav button.active{background:rgba(255,255,255,.11);color:#fff}.nav i{width:25px;font-style:normal;text-align:center}.side-note{margin-top:auto;padding:15px;border:1px solid rgba(255,255,255,.12);border-radius:10px;background:rgba(255,255,255,.06)}.side-note strong{display:block;margin-top:7px;font-size:24px}
+    .main{min-width:0;padding:28px}.topbar{display:flex;align-items:center;justify-content:space-between;gap:18px;margin-bottom:18px}.eyebrow{margin-bottom:3px;color:var(--brand);font-weight:800}.top-actions,.actions,.filters{display:flex;align-items:center;gap:9px}.top-actions select{min-width:210px}
+    input,select,textarea{width:100%;padding:10px 11px;border:1px solid var(--line);border-radius:8px;background:#fff;color:var(--ink);outline:0}textarea{resize:vertical}input:focus,select:focus,textarea:focus{border-color:var(--brand);box-shadow:0 0 0 3px rgba(15,118,110,.13)}label{display:grid;gap:6px;color:var(--muted);font-size:13px;font-weight:800}.btn{min-height:41px;padding:8px 13px;border:1px solid transparent;border-radius:8px;font-weight:800;white-space:nowrap}.btn.primary{background:var(--brand);color:#fff}.btn.primary:hover{background:var(--brand2)}.btn.ghost{border-color:var(--line);background:#fff;color:var(--ink)}.btn.danger{border-color:#fecaca;background:#fff5f5;color:#991b1b}.btn.small{min-height:31px;padding:4px 8px;font-size:12px}.btn:disabled{cursor:wait;opacity:.58}
+    .notice{display:none;margin-bottom:16px;padding:12px 14px;border-radius:8px;background:#fff3d6;color:#7a4b00;font-weight:800}.notice.show{display:block}.notice.ok{background:#e7f5f1;color:#075e57}.notice.error{background:#fee7e7;color:#991b1b}.view{display:none}.view.active{display:block}.panel,.metric{border:1px solid var(--line);border-radius:10px;background:var(--card);box-shadow:var(--shadow)}.panel{padding:19px}.panel+.panel{margin-top:16px}.panel-head{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;margin-bottom:15px}.panel-head p{margin-bottom:0;color:var(--muted)}
+    .kpis{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:14px;margin-bottom:16px}.metric{padding:17px}.metric span,.metric small{color:var(--muted)}.metric strong{display:block;margin:7px 0 2px;font-size:27px;line-height:1.15}.metric.alert strong{color:var(--danger)}.grid-2{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(300px,.8fr);gap:16px}.list{display:grid;gap:11px}.vehicle-row,.card-row,.maintenance-card,.driver-card,.car-card,.budget-card,.report-card{padding:13px;border:1px solid var(--line);border-radius:8px;background:#fff}.vehicle-row{display:grid;grid-template-columns:1.4fr repeat(3,minmax(100px,.6fr));gap:10px;align-items:center}.vehicle-row strong,.card-row strong,.maintenance-card strong,.driver-card strong{display:block}.badge{display:inline-flex;align-items:center;min-height:27px;padding:3px 8px;border-radius:999px;background:#e7f5f1;color:#075e57;font-size:12px;font-weight:800}.badge.warn{background:#fff2d2;color:#8a5100}.badge.bad{background:#fee7e7;color:#991b1b}.empty{padding:18px;color:var(--muted);text-align:center}
+    .form-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:13px}.stack{display:grid;gap:11px}.full{grid-column:1/-1}.upload{min-height:108px;padding:12px;border:1px dashed #b7c8c4;border-radius:8px;background:#f8fbfa;align-content:center}.upload input{padding:0;border:0;background:transparent;box-shadow:none}.upload span{color:var(--muted);font-size:12px}.assistant{margin-bottom:13px;padding:11px 13px;border:1px solid var(--line);border-radius:8px;background:#f8fbfa}.assistant div{display:flex;flex-wrap:wrap;gap:7px;margin-top:7px}.assistant span{padding:4px 8px;border-radius:999px;background:#eaf1ef;color:var(--muted);font-size:12px}.assistant.warn{border-color:#fecaca;background:#fff7f7}.assistant.warn p{margin:7px 0 0;color:var(--danger);font-weight:800}
+    .filter-grid{display:grid;grid-template-columns:1.3fr .8fr .7fr .7fr;gap:11px;align-items:end;margin-bottom:13px}.range{display:grid;grid-template-columns:1fr 1fr;gap:10px}.hidden{display:none!important}.summary-line{display:flex;justify-content:space-between;gap:12px;margin-bottom:12px;padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:#f8fbfa}.table-wrap{overflow:auto}table{width:100%;min-width:1000px;border-collapse:collapse}th,td{padding:11px 9px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}th{color:var(--muted);font-size:12px}.doc-links{display:grid;gap:3px}.doc-links a{color:var(--brand2);font-weight:800;text-decoration:none}.row-actions{display:flex;flex-wrap:wrap;gap:5px}
+    .budget-form{display:grid;grid-template-columns:1fr repeat(2,minmax(0,1fr)) auto;gap:11px;align-items:end;margin-bottom:13px}.budget-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}.budget-card>strong{display:block;font-size:22px}.progress{height:9px;margin:10px 0;overflow:hidden;border-radius:999px;background:#e8efed}.progress span{display:block;height:100%;border-radius:inherit;background:var(--brand)}.budget-card.over{border-color:#fecaca;background:#fffafa}.budget-card.over .progress span{background:var(--danger)}.budget-values{display:grid;grid-template-columns:1fr 1fr;gap:8px}.budget-values strong{display:block}.budget-alert{display:none;margin-bottom:11px;padding:10px 12px;border-radius:8px;background:#fee7e7;color:#991b1b}.budget-alert.show{display:block}
+    .car-card{display:grid;grid-template-columns:95px 1fr;gap:13px}.car-image{width:95px;aspect-ratio:4/3;overflow:hidden;border-radius:8px;background:linear-gradient(135deg,var(--brand),var(--accent))}.car-image img{width:100%;height:100%;object-fit:cover}.report-list{display:grid;gap:10px;margin-bottom:14px}.report-card{display:grid;grid-template-columns:1.2fr repeat(3,1fr);gap:10px;align-items:center}.report-card strong{display:block}.calendar{display:grid;grid-template-columns:repeat(7,minmax(110px,1fr));gap:7px}.weekday{padding:7px;color:var(--muted);font-weight:800;text-align:center}.day{min-height:125px;padding:9px;border:1px solid var(--line);border-radius:8px;background:#fff}.day.blank{border-color:transparent;background:transparent}.event{display:block;margin-top:6px;padding:5px 6px;border-left:3px solid var(--brand);border-radius:5px;background:#eaf7f4;color:#27423e;font-size:11px}.event.service{border-left-color:var(--accent);background:#fff5dc;color:#604000}
+    @media(max-width:1180px){.app{grid-template-columns:1fr}.sidebar{position:static;height:auto}.nav{grid-template-columns:repeat(auto-fit,minmax(140px,1fr))}.side-note{display:none}.kpis{grid-template-columns:repeat(2,1fr)}.form-grid,.grid-2{grid-template-columns:repeat(2,1fr)}.filter-grid{grid-template-columns:repeat(2,1fr)}.calendar{grid-template-columns:repeat(7,minmax(92px,1fr))}}
+    @media(max-width:720px){.main{padding:16px}.topbar,.panel-head,.top-actions,.filters,.summary-line{align-items:stretch;display:grid}.kpis,.grid-2,.form-grid,.filter-grid,.budget-form,.budget-grid,.range,.vehicle-row,.report-card{grid-template-columns:1fr}.calendar{grid-template-columns:1fr}.weekday{display:none}.day.blank{display:none}.day{min-height:70px}.top-actions select{min-width:0}}
+  </style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand"><div class="brand-mark">F</div><div><strong>Fleet Fuel</strong><span>ระบบเบิกค่าน้ำมัน</span></div></div>
+    <nav class="nav">
+      <button class="active" data-view="dashboard"><i>⌂</i>แดชบอร์ด</button>
+      <button data-view="claim"><i>＋</i>บันทึกเบิก</button>
+      <button data-view="history"><i>▤</i>ประวัติ</button>
+      <button data-view="report"><i>◫</i>รายงานเดือน</button>
+      <button data-view="calendar"><i>□</i>ปฏิทิน</button>
+      <button data-view="maintenance"><i>⚙</i>ซ่อมบำรุง</button>
+      <button data-view="cars"><i>▣</i>รถและคนขับ</button>
+    </nav>
+    <div class="side-note"><span>รอบเบิกถัดไปโดยประมาณ</span><strong id="nextDistanceSummary">-</strong><small>อ้างอิงรายการล่าสุด</small></div>
+  </aside>
 
-      <main class="main">
-        <header class="topbar">
-          <div>
-            <p class="eyebrow">Google Web App</p>
-            <h1>จัดการค่าน้ำมัน รถเซลล์ และประวัติรถ</h1>
-          </div>
-          <div class="top-actions">
-            <select id="carFilter"></select>
-            <button class="primary-btn" data-view-link="claim">บันทึกเบิกใหม่</button>
-          </div>
-        </header>
+  <main class="main">
+    <header class="topbar">
+      <div><p class="eyebrow">GitHub Pages + Google Apps Script</p><h1>จัดการค่าน้ำมันและประวัติรถ</h1></div>
+      <div class="top-actions"><select id="carFilter" aria-label="กรองรถ"></select><button class="btn primary" data-view="claim">บันทึกเบิกใหม่</button></div>
+    </header>
+    <div class="notice" id="notice" role="status"></div>
 
-        <div class="notice" id="notice">กำลังโหลดข้อมูล...</div>
+    <section class="view active" id="dashboard">
+      <div class="kpis">
+        <article class="metric"><span>ยอดเบิกเดือนนี้</span><strong id="monthAmount">฿0</strong><small>ตามรถที่เลือก</small></article>
+        <article class="metric"><span>กิโลเมตรเดือนนี้</span><strong id="monthKm">0 กม.</strong><small>รวมระยะทางรอบเบิก</small></article>
+        <article class="metric"><span>ค่าเฉลี่ย/กม.</span><strong id="avgCost">฿0</strong><small>ใช้ตรวจความผิดปกติ</small></article>
+        <article class="metric alert"><span>แจ้งเตือนวงเงิน</span><strong id="budgetWarningCount">0 รายการ</strong><small>สัปดาห์/เดือน</small></article>
+        <article class="metric alert"><span>แจ้งเตือนซ่อม</span><strong id="serviceAlert">0 รายการ</strong><small>รถที่ไม่อยู่สถานะใช้งาน</small></article>
+      </div>
+      <div class="grid-2">
+        <section class="panel"><div class="panel-head"><div><h2>สรุปตามรถ</h2><p>ยอดสะสมเดือนปัจจุบัน</p></div></div><div class="list" id="vehicleSummary"></div></section>
+        <section class="panel"><div class="panel-head"><div><h2>รอบเบิกถัดไป</h2><p>จากรายการล่าสุด</p></div></div><div id="nextClaimCard"></div></section>
+      </div>
+      <section class="panel">
+        <div class="panel-head"><div><h2>วงเงินเบิก</h2><p>กำหนดแยกตามรถ หรือเลือก “รถทุกคัน” เพื่อกำหนดวงเงินรวม</p></div></div>
+        <form class="budget-form" id="budgetForm"><input type="hidden" name="carId"><div><small>กำลังตั้งวงเงินสำหรับ</small><strong id="budgetScopeLabel">รถทุกคัน</strong></div><label>รายสัปดาห์<input type="number" min="0" name="weeklyBudgetLimit" placeholder="10000"></label><label>รายเดือน<input type="number" min="0" name="monthlyBudgetLimit" placeholder="40000"></label><button class="btn primary" type="submit">บันทึกวงเงิน</button></form>
+        <div class="budget-alert" id="budgetAlert"></div><div class="budget-grid" id="budgetDashboard"></div>
+      </section>
+    </section>
 
-        <section class="view active" id="dashboard">
-          <div class="kpi-grid">
-            <article class="metric"><span>ยอดเบิกเดือนนี้</span><strong id="monthAmount">฿0</strong><small>รวมตามรายการในชีต</small></article>
-            <article class="metric"><span>กิโลเมตรเดือนนี้</span><strong id="monthKm">0 กม.</strong><small>ตรวจจากรูปหน้าไมล์แต่ละรอบ</small></article>
-            <article class="metric"><span>ค่าเฉลี่ย/กม.</span><strong id="avgCost">฿0</strong><small>ใช้ดูความผิดปกติ</small></article>
-            <article class="metric alert"><span>แจ้งเตือนวงเงิน</span><strong id="budgetWarningCount">0 รายการ</strong><small>เกินงบรายสัปดาห์/เดือน</small></article>
-            <article class="metric alert"><span>แจ้งเตือนซ่อม</span><strong id="serviceAlert">0 รายการ</strong><small>รถที่ใกล้ถึงรอบตรวจเช็ก</small></article>
-          </div>
-          <div class="content-grid">
-            <section class="panel wide">
-              <div class="panel-head">
-                <div><h2>สรุปตามรถ</h2><p>ยอดเงินและระยะทางที่เบิกไปแล้ว</p></div>
-                <div class="segmented">
-                  <button class="active" data-period="week">สัปดาห์</button>
-                  <button data-period="month">เดือน</button>
-                  <button data-period="all">ทั้งหมด</button>
-                </div>
-              </div>
-              <div class="vehicle-list" id="vehicleSummary"></div>
-            </section>
-            <section class="panel">
-              <div class="panel-head"><div><h2>รอบเบิกถัดไป</h2><p>ประมาณระยะทางก่อนเปิดรอบใหม่</p></div></div>
-              <div class="next-card" id="nextClaimCard"></div>
-            </section>
-          </div>
-          <section class="panel budget-panel">
-            <div class="panel-head">
-              <div>
-                <h2>วงเงินเบิก</h2>
-                <p>ตั้งงบรายสัปดาห์และรายเดือน แล้วดูยอดคงเหลือตามรถที่เลือก</p>
-              </div>
-            </div>
-            <form class="budget-form" id="budgetForm">
-              <input type="hidden" name="carId">
-              <div class="budget-scope">
-                <small>กำลังตั้งวงเงินสำหรับ</small>
-                <strong id="budgetScopeLabel">รถทุกคัน</strong>
-              </div>
-              <label>จำกัดรายสัปดาห์ไม่เกิน
-                <input type="number" name="weeklyBudgetLimit" placeholder="เช่น 10000">
-              </label>
-              <label>จำกัดรายเดือนไม่เกิน
-                <input type="number" name="monthlyBudgetLimit" placeholder="เช่น 40000">
-              </label>
-              <button class="primary-btn" type="submit">บันทึกวงเงิน</button>
-            </form>
-            <div class="budget-alert" id="budgetAlert"></div>
-            <div class="budget-grid" id="budgetDashboard"></div>
-          </section>
-          <section class="panel car-dashboard-panel">
-            <div class="panel-head">
-              <div>
-                <h2>แดชบอร์ดเฉพาะคัน</h2>
-                <p>ดูวันที่เบิก ระยะทาง เลขไมล์ และยอดเบิกของรถที่เลือก</p>
-              </div>
-            </div>
-            <div id="singleCarDashboard" class="single-car-dashboard"></div>
-          </section>
-        </section>
+    <section class="view" id="claim">
+      <section class="panel">
+        <div class="panel-head"><div><h2>บันทึกรอบเบิกค่าน้ำมัน</h2><p>รายการใหม่ต้องแนบรูปหน้าไมล์ทุกครั้ง</p></div></div>
+        <div class="assistant" id="claimAssistant"></div>
+        <form class="form-grid" id="claimForm">
+          <input type="hidden" name="claimId">
+          <label>เซลล์ที่เบิก<input name="salesName" required></label><label>รถที่เบิก<select name="carId" required></select></label><label>คนขับ<input name="driverName"></label><label>วันที่เบิก<input type="date" name="claimDate" required></label>
+          <label>เลขไมล์ปัจจุบัน<input type="number" min="0" name="odometerKm" required></label><label>ระยะทางรอบนี้ (กม.)<input type="number" min="0" name="distanceKm" required></label><label>จำนวนเงิน<input type="number" min="0" step="0.01" name="amount" required></label><label>รอบถัดไปประมาณ (กม.)<input type="number" min="0" name="nextClaimDistanceKm"></label>
+          <label>สถานะจ่ายเงิน<select name="paymentStatus"><option>รอตรวจเอกสาร</option><option>รอโอน</option><option>โอนแล้ว</option></select></label>
+          <label class="upload">รูปหน้าไมล์รถ<input type="file" name="odometerPhoto" accept="image/*"><span>จำเป็นสำหรับรายการใหม่ · สูงสุด 8 MB</span></label><label class="upload">ใบเสร็จ<input type="file" name="receipt" accept="image/*,.pdf"><span>รูปภาพหรือ PDF · สูงสุด 8 MB</span></label><label class="upload">สลิปโอน<input type="file" name="transferSlip" accept="image/*,.pdf"><span>แนบเมื่อโอนแล้ว · สูงสุด 8 MB</span></label>
+          <label class="full">หมายเหตุ<textarea name="note" rows="3"></textarea></label><div class="actions full"><button class="btn ghost" type="reset" id="cancelEditClaim">ล้างข้อมูล</button><button class="btn primary" type="submit" id="claimSubmitText">บันทึกรายการ</button></div>
+        </form>
+      </section>
+    </section>
 
-        <section class="view" id="claim">
-          <section class="panel">
-            <div class="panel-head">
-              <div>
-                <h2>บันทึกรอบเบิกค่าน้ำมัน</h2>
-                <p>เลขกิโลเมตรต้องแนบรูปหน้าไมล์รถทุกครั้ง</p>
-              </div>
-            </div>
-            <div class="claim-assistant" id="claimAssistant"></div>
-            <form class="claim-form" id="claimForm">
-              <input type="hidden" name="claimId">
-              <label>เซลล์ที่เบิก<input name="salesName" required></label>
-              <label>รถที่เบิก<select name="carId" required></select></label>
-              <label>คนขับ<input name="driverName" placeholder="ระบบเติมจากข้อมูลรถได้"></label>
-              <label>วันที่เบิก<input type="date" name="claimDate" required></label>
-              <label>เลขไมล์ปัจจุบัน<input type="number" name="odometerKm" placeholder="อ่านจากรูปหน้าไมล์" required></label>
-              <label>ระยะทางรอบนี้ (กม.)<input type="number" name="distanceKm" placeholder="คำนวณจากเลขไมล์รอบก่อน" required></label>
-              <label>จำนวนเงิน<input type="number" name="amount" placeholder="ระบบช่วยประเมินได้" required></label>
-              <label>รอบถัดไปประมาณ (กม.)<input type="number" name="nextClaimDistanceKm" placeholder="คำนวณจากยอดเงิน"></label>
-              <label>สถานะจ่ายเงิน<select name="paymentStatus"><option>รอตรวจเอกสาร</option><option>รอโอน</option><option>โอนแล้ว</option></select></label>
-              <label class="upload-box">รูปหน้าไมล์รถ<input type="file" name="odometerPhoto" accept="image/*"><span>บังคับแนบตอนเพิ่มใหม่ / ตอนแก้ไขถ้าไม่แนบจะใช้ไฟล์เดิม</span></label>
-              <label class="upload-box">ใบเสร็จ<input type="file" name="receipt" accept="image/*,.pdf"><span>รูปภาพหรือ PDF</span></label>
-              <label class="upload-box">สลิปโอนเงิน<input type="file" name="transferSlip" accept="image/*,.pdf"><span>แนบเมื่อโอนแล้ว</span></label>
-              <label class="full">หมายเหตุ<textarea name="note" rows="3"></textarea></label>
-              <div class="form-actions full">
-                <button type="reset" class="ghost-btn" id="cancelEditClaim">ล้างข้อมูล</button>
-                <button type="submit" class="primary-btn" id="claimSubmitText">บันทึกรายการ</button>
-              </div>
-            </form>
-          </section>
-        </section>
+    <section class="view" id="history">
+      <section class="panel">
+        <div class="panel-head"><div><h2>ประวัติย้อนหลัง</h2><p>ค้นหา กรอง แก้ไข ลบ และส่งออก</p></div><div class="filters"><button class="btn ghost" id="exportHistoryCsv" type="button">CSV</button><button class="btn ghost" id="exportHistoryExcel" type="button">Excel</button></div></div>
+        <div class="filter-grid"><label>ค้นหา<input id="historySearch" placeholder="ชื่อ ทะเบียน สถานะ"></label><label>รถ<select id="historyCar"></select></label><label>ช่วงเวลา<select id="historyPeriod"><option value="week">สัปดาห์นี้</option><option value="month">เลือกเดือน</option><option value="custom">ช่วงวันที่</option><option value="all">ทั้งหมด</option></select></label><label id="historyMonthWrap" class="hidden">เดือน<input type="month" id="historyMonth"></label><div class="range hidden" id="historyRangeWrap"><label>จาก<input type="date" id="historyStart"></label><label>ถึง<input type="date" id="historyEnd"></label></div></div>
+        <div class="summary-line" id="historySummary"></div><div class="table-wrap"><table><thead><tr><th>วันที่</th><th>รถ/ผู้รับผิดชอบ</th><th>เลขไมล์</th><th>ยอดเบิก</th><th>เอกสาร</th><th>สถานะ</th><th>หมายเหตุ</th><th>จัดการ</th></tr></thead><tbody id="historyRows"></tbody></table></div>
+      </section>
+    </section>
 
-        <section class="view" id="history">
-          <section class="panel">
-            <div class="panel-head">
-              <div><h2>ประวัติย้อนหลัง</h2><p>กรองตามรถ รายสัปดาห์ รายเดือน หรือทั้งหมด</p></div>
-              <div class="filters">
-                <button class="ghost-btn" type="button" id="exportHistoryCsv">CSV</button>
-                <button class="ghost-btn" type="button" id="exportHistoryExcel">Excel</button>
-              </div>
-            </div>
-            <div class="filter-grid">
-              <label>ค้นหา<input id="historySearch" placeholder="ชื่อ ทะเบียน สถานะ หมายเหตุ"></label>
-              <label>รถ<select id="historyCar"></select></label>
-              <label>ช่วงเวลา<select id="historyPeriod"><option value="week">สัปดาห์นี้</option><option value="month">เลือกเดือน</option><option value="custom">ช่วงวันที่</option><option value="all">ทั้งหมด</option></select></label>
-              <label id="historyMonthWrap">เดือน<input type="month" id="historyMonth"></label>
-              <div class="range-fields is-hidden" id="historyRangeWrap">
-                <label>จากวันที่<input type="date" id="historyStart"></label>
-                <label>ถึงวันที่<input type="date" id="historyEnd"></label>
-              </div>
-            </div>
-            <div class="inline-summary" id="historySummary"></div>
-            <div class="table-wrap">
-              <table>
-                <thead><tr><th>วันที่</th><th>รถ/ผู้รับผิดชอบ</th><th>เลขไมล์</th><th>ยอดเบิก</th><th>รอบถัดไป</th><th>เอกสาร</th><th>สถานะ</th><th>รายละเอียด</th><th>จัดการ</th></tr></thead>
-                <tbody id="historyRows"></tbody>
-              </table>
-            </div>
-          </section>
-        </section>
+    <section class="view" id="report">
+      <section class="panel">
+        <div class="panel-head"><div><h2>รายงานรายเดือน</h2><p>สรุปน้ำมันและซ่อมบำรุง</p></div><div class="filters"><button class="btn ghost" id="exportReportCsv" type="button">CSV</button><button class="btn ghost" id="exportReportExcel" type="button">Excel</button></div></div>
+        <div class="filter-grid"><label>เดือน<input type="month" id="reportMonth"></label><label>รถ<select id="reportCar"></select></label></div><div class="kpis" id="reportSummary"></div><div class="report-list" id="reportByCar"></div><div class="table-wrap"><table><thead><tr><th>วันที่</th><th>ประเภท</th><th>รถ</th><th>รายละเอียด</th><th>ระยะทาง</th><th>ยอดเงิน</th></tr></thead><tbody id="reportDetailRows"></tbody></table></div>
+      </section>
+    </section>
 
-        <section class="view" id="report">
-          <section class="panel">
-            <div class="panel-head">
-              <div><h2>รายงานรายเดือน</h2><p>สรุปยอดเบิก ระยะทาง ค่าเฉลี่ย และค่าซ่อมบำรุงตามเดือน</p></div>
-              <div class="filters">
-                <button class="ghost-btn" type="button" id="exportReportCsv">CSV</button>
-                <button class="ghost-btn" type="button" id="exportReportExcel">Excel</button>
-              </div>
-            </div>
-            <div class="filter-grid compact">
-              <label>เดือน<input type="month" id="reportMonth"></label>
-              <label>รถ<select id="reportCar"></select></label>
-            </div>
-            <div class="kpi-grid report-summary" id="reportSummary"></div>
-            <div class="report-list" id="reportByCar"></div>
-            <div class="table-wrap">
-              <table>
-                <thead><tr><th>วันที่</th><th>ประเภท</th><th>รถ</th><th>รายละเอียด</th><th>ระยะทาง</th><th>ยอดเงิน</th><th>ไฟล์</th></tr></thead>
-                <tbody id="reportDetailRows"></tbody>
-              </table>
-            </div>
-          </section>
-        </section>
+    <section class="view" id="calendar">
+      <section class="panel"><div class="panel-head"><div><h2>ปฏิทินรายเดือน</h2><p>รอบเบิกและซ่อมบำรุง</p></div><div class="filters"><input type="month" id="calendarMonth"><select id="calendarCar"></select></div></div><div class="summary-line" id="calendarSummary"></div><div class="calendar" id="calendarGrid"></div></section>
+    </section>
 
-        <section class="view" id="calendar">
-          <section class="panel">
-            <div class="panel-head">
-              <div><h2>ปฏิทินรายเดือน</h2><p>ดูรอบเบิกและซ่อมบำรุงตามวันของแต่ละเดือน</p></div>
-              <div class="filters">
-                <input type="month" id="calendarMonth">
-                <select id="calendarCar"></select>
-              </div>
-            </div>
-            <div class="inline-summary" id="calendarSummary"></div>
-            <div class="calendar-grid" id="calendarGrid"></div>
-          </section>
-        </section>
+    <section class="view" id="maintenance">
+      <section class="panel"><div class="panel-head"><div><h2>ซ่อมบำรุง</h2><p>บันทึกค่าใช้จ่ายและเอกสารของรถแต่ละคัน</p></div></div>
+        <form class="form-grid" id="maintenanceForm"><label>วันที่<input type="date" name="date" required></label><label>รถ<select name="carId" required></select></label><label>รายการซ่อม<input name="title" required></label><label>ค่าใช้จ่าย<input type="number" min="0" step="0.01" name="cost"></label><label>ร้าน/ศูนย์<input name="shop"></label><label>รอบถัดไป<input name="nextService" placeholder="เช่น 85,000 กม."></label><label class="upload">ใบเสร็จซ่อม<input type="file" name="receipt" accept="image/*,.pdf"><span>สูงสุด 8 MB</span></label><label class="upload">รูปงานซ่อม<input type="file" name="maintenancePhoto" accept="image/*"><span>สูงสุด 8 MB</span></label><label class="upload">เอกสารเพิ่มเติม<input type="file" name="maintenanceDocument" accept="image/*,.pdf"><span>สูงสุด 8 MB</span></label><label class="full">หมายเหตุ<textarea name="note" rows="2"></textarea></label><div class="actions full"><button class="btn primary" type="submit">บันทึกซ่อมบำรุง</button></div></form>
+        <div class="list" id="maintenanceList" style="margin-top:16px"></div>
+      </section>
+    </section>
 
-        <section class="view" id="maintenance">
-          <section class="panel">
-            <div class="panel-head"><div><h2>ซ่อมบำรุง</h2><p>เพิ่มและดูประวัติซ่อมแต่ละคัน</p></div></div>
-            <form class="claim-form compact" id="maintenanceForm">
-              <label>วันที่<input type="date" name="date" required></label>
-              <label>รถ<select name="carId" required></select></label>
-              <label>รายการซ่อม<input name="title" required></label>
-              <label>ค่าใช้จ่าย<input type="number" name="cost"></label>
-              <label>ร้าน/ศูนย์<input name="shop"></label>
-              <label>รอบถัดไป<input name="nextService" placeholder="เช่น 85,000 กม."></label>
-              <label class="upload-box">ใบเสร็จซ่อม<input type="file" name="receipt" accept="image/*,.pdf"><span>ถ้ามี</span></label>
-              <label class="upload-box">รูปงานซ่อม<input type="file" name="maintenancePhoto" accept="image/*"><span>รูปก่อน/หลังซ่อม</span></label>
-              <label class="upload-box">เอกสารเพิ่มเติม<input type="file" name="maintenanceDocument" accept="image/*,.pdf"><span>ใบเสนอราคา หรือเอกสารอื่น</span></label>
-              <label class="full">หมายเหตุ<textarea name="note" rows="2"></textarea></label>
-              <div class="form-actions full"><button class="primary-btn" type="submit">บันทึกซ่อมบำรุง</button></div>
-            </form>
-            <div class="maintenance-list" id="maintenanceList"></div>
-          </section>
-        </section>
+    <section class="view" id="cars">
+      <div class="grid-2">
+        <section class="panel"><div class="panel-head"><div><h2>รถ</h2><p>เพิ่มหรือแก้ไขข้อมูลรถ</p></div></div><form class="stack" id="carForm"><input type="hidden" name="carId"><input type="hidden" name="carPhotoUrl"><label>ทะเบียน<input name="plate" required></label><label>รุ่นรถ<input name="model" required></label><label>สี<input name="color"></label><label>เซลล์<input name="salesName"></label><label>คนขับ<input name="driverName"></label><label>สถานะ<select name="status"><option>ใช้งาน</option><option>รอเช็กระยะ</option><option>งดใช้งาน</option></select></label><label>เลขไมล์ล่าสุด<input type="number" min="0" name="currentOdometerKm"></label><label>รอบซ่อมถัดไป<input type="number" min="0" name="nextServiceKm"></label><label class="upload">รูปรถ<input type="file" name="carPhoto" accept="image/*"><span>สูงสุด 8 MB</span></label><div class="actions"><button class="btn ghost" type="reset" id="cancelEditCar" hidden>ยกเลิก</button><button class="btn primary" id="carSubmitText" type="submit">เพิ่มรถ</button></div></form><div class="list" id="carCards" style="margin-top:16px"></div></section>
+        <section class="panel"><div class="panel-head"><div><h2>คนขับ</h2><p>เพิ่มหรือแก้ไขผู้รับผิดชอบรถ</p></div></div><form class="stack" id="driverForm"><input type="hidden" name="driverId"><label>ชื่อคนขับ<input name="driverName" required></label><label>เบอร์โทร<input name="phone"></label><label>พื้นที่<input name="area"></label><label>เลขใบขับขี่<input name="licenseNo"></label><label>หมายเหตุ<textarea name="note" rows="2"></textarea></label><div class="actions"><button class="btn ghost" type="reset" id="cancelEditDriver" hidden>ยกเลิก</button><button class="btn primary" id="driverSubmitText" type="submit">เพิ่มคนขับ</button></div></form><div class="list" id="driverList" style="margin-top:16px"></div></section>
+      </div>
+    </section>
+  </main>
+</div>
 
-        <section class="view" id="cars">
-          <div class="content-grid">
-            <section class="panel">
-              <div class="panel-head"><div><h2>เพิ่มข้อมูลรถ</h2><p>ทะเบียน สี รูปรถ และผู้รับผิดชอบ</p></div></div>
-              <form class="stack-form" id="carForm">
-                <input type="hidden" name="carId">
-                <input type="hidden" name="carPhotoUrl">
-                <label>ทะเบียน<input name="plate" required></label>
-                <label>รุ่นรถ<input name="model" required></label>
-                <label>สี<input name="color"></label>
-                <label>เซลล์<input name="salesName"></label>
-                <label>คนขับ<input name="driverName"></label>
-                <label>สถานะ<select name="status"><option>ใช้งาน</option><option>รอเช็กระยะ</option><option>งดใช้งาน</option></select></label>
-                <label>เลขไมล์ล่าสุด<input type="number" name="currentOdometerKm"></label>
-                <label>รอบซ่อมถัดไป<input type="number" name="nextServiceKm"></label>
-                <label class="upload-box">รูปรถ<input type="file" name="carPhoto" accept="image/*"><span>ใช้แสดงในทะเบียนรถ</span></label>
-                <div class="form-actions"><button class="ghost-btn" type="reset" id="cancelEditCar" hidden>ยกเลิกแก้ไข</button><button class="primary-btn" type="submit" id="carSubmitText">เพิ่มรถ</button></div>
-              </form>
-              <div class="car-cards" id="carCards"></div>
-            </section>
-            <section class="panel">
-              <div class="panel-head"><div><h2>เพิ่มคนขับ</h2><p>เบอร์โทร พื้นที่ และหมายเหตุ</p></div></div>
-              <form class="stack-form" id="driverForm">
-                <input type="hidden" name="driverId">
-                <label>ชื่อคนขับ<input name="driverName" required></label>
-                <label>เบอร์โทร<input name="phone"></label>
-                <label>พื้นที่<input name="area"></label>
-                <label>เลขใบขับขี่<input name="licenseNo"></label>
-                <label>หมายเหตุ<textarea name="note" rows="2"></textarea></label>
-                <div class="form-actions"><button class="ghost-btn" type="reset" id="cancelEditDriver" hidden>ยกเลิกแก้ไข</button><button class="primary-btn" type="submit" id="driverSubmitText">เพิ่มคนขับ</button></div>
-              </form>
-              <div class="driver-list" id="driverList"></div>
-            </section>
-          </div>
-        </section>
-      </main>
-    </div>
-    <script>
-let state = { cars: [], drivers: [], claims: [], maintenance: [], settings: { weeklyBudgetLimit: 0, monthlyBudgetLimit: 0, budgetsByCar: {} } };
-const formatter = new Intl.NumberFormat('th-TH');
-const monthFormatter = new Intl.DateTimeFormat('th-TH', { month: 'long', year: 'numeric' });
-const money = (value) => `฿${formatter.format(Number(value || 0))}`;
-const km = (value) => `${formatter.format(Number(value || 0))} กม.`;
+<script>
+"use strict";
+
+const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxD4zUqznHuIkHemew375HR7Ub-teIJAWWafen4nmVcuIRBBziAf1k45eN3e3ALxbg/exec";
+const MAX_FILE_BYTES = 8 * 1024 * 1024;
 const DEFAULT_COST_PER_KM = 4;
+let state = {cars:[],drivers:[],claims:[],maintenance:[],settings:{weeklyBudgetLimit:0,monthlyBudgetLimit:0,budgetsByCar:{}}};
+const numberFormat = new Intl.NumberFormat("th-TH", {maximumFractionDigits:2});
+const money = value => `฿${numberFormat.format(Number(value||0))}`;
+const km = value => `${numberFormat.format(Number(value||0))} กม.`;
 
-document.addEventListener('DOMContentLoaded', () => {
-  try {
-    bindNavigation();
-    bindForms();
-    setToday();
-    setCurrentMonth();
-    showNotice('หน้าเว็บโหลดแล้ว กำลังเชื่อมต่อ Google Apps Script...');
-    loadData();
-  } catch (error) {
-    showNotice('JavaScript หน้าเว็บมีปัญหา: ' + (error.message || String(error)), 'error');
-  }
+document.addEventListener("DOMContentLoaded", () => {
+  bindNavigation(); bindForms(); setDefaults(); loadData();
 });
 
-function showNotice(message, type = '') {
-  const el = document.querySelector('#notice');
-  if (!el) return;
-  el.textContent = message;
-  el.className = `notice show ${type}`;
+async function callApi(action, payload={}) {
+  if (!GAS_WEB_APP_URL.endsWith("/exec")) throw new Error("GAS_WEB_APP_URL ต้องลงท้ายด้วย /exec");
+  const response = await fetch(GAS_WEB_APP_URL, {
+    method:"POST", mode:"cors", credentials:"omit", redirect:"follow", cache:"no-store",
+    headers:{"Content-Type":"text/plain;charset=utf-8"},
+    body:JSON.stringify({action,payload})
+  });
+  const text = await response.text();
+  if (!response.ok) throw new Error(`Google Apps Script ตอบกลับ HTTP ${response.status}`);
+  let result;
+  try { result = JSON.parse(text); }
+  catch (_) { throw new Error("เซิร์ฟเวอร์ไม่ได้ส่ง JSON กลับมา โปรด Deploy Code.gs เวอร์ชันล่าสุดเป็น Web app"); }
+  if (!result.success) throw new Error(result.message || "คำสั่งไม่สำเร็จ");
+  return result.data;
 }
 
-function clearNotice() {
-  const el = document.querySelector('#notice');
-  if (el) el.className = 'notice';
-}
-
-function loadData() {
-  showNotice('กำลังโหลดข้อมูล...');
-  if (!window.google || !google.script || !google.script.run) {
-    showNotice('ติดต่อ Google Apps Script ไม่ได้: กรุณาเปิดจากลิงก์ /exec และ Deploy เป็น Web app ใหม่', 'error');
-    loadDemoData_();
-    return;
+async function loadData() {
+  showNotice("กำลังโหลดข้อมูล...");
+  try {
+    state = normalizeState(await callApi("getInitialData"));
+    populateSelects(); renderAll(); showNotice("พร้อมใช้งาน", "ok"); setTimeout(clearNotice,1400);
+  } catch (error) {
+    showNotice(`เชื่อมต่อ Google Apps Script ไม่สำเร็จ: ${error.message}`, "error");
+    populateSelects(); renderAll();
   }
-  google.script.run
-    .withSuccessHandler((data) => {
-      state = normalizeState(data);
-      populateSelects();
-      renderAll();
-      showNotice('พร้อมใช้งาน', 'ok');
-      setTimeout(clearNotice, 1800);
-    })
-    .withFailureHandler((error) => {
-      showNotice('โหลดข้อมูลจาก Sheet ไม่ได้: ' + (error && error.message ? error.message : String(error)), 'error');
-      loadDemoData_();
-    })
-    .getInitialData();
-}
-
-function loadDemoData_() {
-  const today = new Date();
-  const lastWeek = new Date(today);
-  lastWeek.setDate(today.getDate() - 6);
-  const lastMonth = new Date(today);
-  lastMonth.setMonth(today.getMonth() - 1);
-  state = {
-    cars: [
-      {'Car ID':'CAR-001',Plate:'กท 4821',Model:'Toyota Hilux Revo',Color:'ขาว','Sales Name':'ศิริพร','Driver Name':'คุณนนท์',Status:'ใช้งาน','Car Photo URL':'','Current Odometer Km':83720,'Next Service Km':85000},
-      {'Car ID':'CAR-002',Plate:'ขค 9157',Model:'Isuzu D-Max',Color:'เทา','Sales Name':'ภัทร','Driver Name':'คุณเมย์',Status:'ใช้งาน','Car Photo URL':'','Current Odometer Km':72840,'Next Service Km':74000}
-    ],
-    drivers: [
-      {'Driver ID':'DRV-001','Driver Name':'คุณนนท์',Phone:'081-234-9988',Area:'ภาคกลาง','License No':'',Note:''},
-      {'Driver ID':'DRV-002','Driver Name':'คุณเมย์',Phone:'086-111-5454',Area:'ภาคตะวันออก','License No':'',Note:''}
-    ],
-    claims: [
-      {'Claim ID':'CLM-DEMO-001','Created At':dateKey(lastWeek),'Claim Date':dateKey(lastWeek),'Sales Name':'ศิริพร','Car ID':'CAR-001',Plate:'กท 4821','Driver Name':'คุณนนท์','Odometer Km':83120,'Distance Km':620,Amount:2600,'Next Claim Distance Km':650,'Payment Status':'โอนแล้ว','Odometer Photo URL':'','Receipt URL':'','Transfer Slip URL':'',Note:'ตัวอย่างรอบก่อน'},
-      {'Claim ID':'CLM-DEMO-002','Created At':dateKey(today),'Claim Date':dateKey(today),'Sales Name':'ศิริพร','Car ID':'CAR-001',Plate:'กท 4821','Driver Name':'คุณนนท์','Odometer Km':83720,'Distance Km':600,Amount:2550,'Next Claim Distance Km':638,'Payment Status':'รอโอน','Odometer Photo URL':'','Receipt URL':'','Transfer Slip URL':'',Note:'ตัวอย่างเดือนนี้'},
-      {'Claim ID':'CLM-DEMO-003','Created At':dateKey(lastMonth),'Claim Date':dateKey(lastMonth),'Sales Name':'ภัทร','Car ID':'CAR-002',Plate:'ขค 9157','Driver Name':'คุณเมย์','Odometer Km':72840,'Distance Km':540,Amount:2350,'Next Claim Distance Km':588,'Payment Status':'โอนแล้ว','Odometer Photo URL':'','Receipt URL':'','Transfer Slip URL':'',Note:'ตัวอย่างย้อนหลัง'}
-    ],
-    maintenance: [
-      {'Maintenance ID':'MT-DEMO-001',Date:dateKey(today),'Car ID':'CAR-001',Plate:'กท 4821',Title:'เปลี่ยนน้ำมันเครื่อง',Cost:1800,Shop:'ศูนย์บริการ','Next Service':'85,000 กม.','Receipt URL':'','Photo URL':'','Document URL':'',Note:''}
-    ],
-    settings: { weeklyBudgetLimit: 10000, monthlyBudgetLimit: 40000, budgetsByCar: { all: { weeklyBudgetLimit: 10000, monthlyBudgetLimit: 40000 } } }
-  };
-  state = normalizeState(state);
-  populateSelects();
-  renderAll();
 }
 
 function bindNavigation() {
-  document.querySelectorAll('[data-view], [data-view-link]').forEach((button) => {
-    button.addEventListener('click', () => showView(button.dataset.view || button.dataset.viewLink));
-  });
-  document.querySelector('#carFilter')?.addEventListener('change', renderAll);
-  ['#historyCar', '#historyPeriod', '#historyMonth', '#historyStart', '#historyEnd'].forEach((selector) => {
-    document.querySelector(selector)?.addEventListener('change', renderHistory);
-  });
-  document.querySelector('#historySearch')?.addEventListener('input', renderHistory);
-  document.querySelector('#exportHistoryCsv')?.addEventListener('click', () => exportHistory('csv'));
-  document.querySelector('#exportHistoryExcel')?.addEventListener('click', () => exportHistory('excel'));
-  ['#reportMonth', '#reportCar'].forEach((selector) => {
-    document.querySelector(selector)?.addEventListener('change', renderMonthlyReport);
-  });
-  document.querySelector('#exportReportCsv')?.addEventListener('click', () => exportMonthlyReport('csv'));
-  document.querySelector('#exportReportExcel')?.addEventListener('click', () => exportMonthlyReport('excel'));
-  ['#calendarMonth', '#calendarCar'].forEach((selector) => {
-    document.querySelector(selector)?.addEventListener('change', renderCalendar);
-  });
-  document.querySelectorAll('[data-period]').forEach((button) => {
-    button.addEventListener('click', () => {
-      document.querySelectorAll('[data-period]').forEach((item) => item.classList.remove('active'));
-      button.classList.add('active');
-      renderVehicleSummary(button.dataset.period);
-    });
-  });
+  document.querySelectorAll("[data-view]").forEach(btn => btn.addEventListener("click",()=>showView(btn.dataset.view)));
+  $("#carFilter").addEventListener("change",renderAll);
+  ["#historyCar","#historyPeriod","#historyMonth","#historyStart","#historyEnd"].forEach(s=>$(s).addEventListener("change",renderHistory));
+  $("#historySearch").addEventListener("input",renderHistory);
+  ["#reportMonth","#reportCar"].forEach(s=>$(s).addEventListener("change",renderReport));
+  ["#calendarMonth","#calendarCar"].forEach(s=>$(s).addEventListener("change",renderCalendar));
+  $("#exportHistoryCsv").addEventListener("click",()=>exportHistory("csv"));
+  $("#exportHistoryExcel").addEventListener("click",()=>exportHistory("excel"));
+  $("#exportReportCsv").addEventListener("click",()=>exportReport("csv"));
+  $("#exportReportExcel").addEventListener("click",()=>exportReport("excel"));
 }
 
 function bindForms() {
-  document.querySelector('#claimForm').addEventListener('submit', submitClaim);
-  document.querySelector('#carForm').addEventListener('submit', submitCar);
-  document.querySelector('#driverForm').addEventListener('submit', submitDriver);
-  document.querySelector('#maintenanceForm').addEventListener('submit', submitMaintenance);
-  document.querySelector('#budgetForm').addEventListener('submit', submitBudgetSettings);
-  document.querySelector('#claimForm select[name="carId"]').addEventListener('change', () => {
-    fillCarDefaults();
-    calculateClaimSmartFields();
-  });
-  ['claimDate', 'odometerKm', 'distanceKm'].forEach((name) => {
-    document.querySelector(`#claimForm [name="${name}"]`)?.addEventListener('input', calculateClaimSmartFields);
-    document.querySelector(`#claimForm [name="${name}"]`)?.addEventListener('change', calculateClaimSmartFields);
-  });
-  document.querySelector('#claimForm [name="amount"]')?.addEventListener('input', (event) => {
-    if (event.currentTarget.value) event.currentTarget.dataset.userEdited = '1';
-    else delete event.currentTarget.dataset.userEdited;
-    calculateClaimSmartFields();
-  });
-  document.querySelector('#cancelEditClaim').addEventListener('click', resetClaimFormMode);
-  document.querySelector('#historyRows').addEventListener('click', handleHistoryAction);
-  document.querySelector('#carCards')?.addEventListener('click', handleCarAction);
-  document.querySelector('#driverList')?.addEventListener('click', handleDriverAction);
-  document.querySelector('#cancelEditCar')?.addEventListener('click', resetCarFormMode);
-  document.querySelector('#cancelEditDriver')?.addEventListener('click', resetDriverFormMode);
+  $("#claimForm").addEventListener("submit",submitClaim); $("#carForm").addEventListener("submit",submitCar);
+  $("#driverForm").addEventListener("submit",submitDriver); $("#maintenanceForm").addEventListener("submit",submitMaintenance);
+  $("#budgetForm").addEventListener("submit",submitBudget);
+  $("#claimForm [name=carId]").addEventListener("change",()=>{fillCarDefaults();calculateClaim();});
+  ["claimDate","odometerKm","distanceKm"].forEach(name=>$("#claimForm [name="+name+"]").addEventListener("input",calculateClaim));
+  $("#claimForm [name=amount]").addEventListener("input",event=>{event.target.dataset.edited=event.target.value?"1":"";calculateClaim();});
+  $("#cancelEditClaim").addEventListener("click",()=>setTimeout(resetClaimForm,0));
+  $("#cancelEditCar").addEventListener("click",()=>setTimeout(resetCarForm,0));
+  $("#cancelEditDriver").addEventListener("click",()=>setTimeout(resetDriverForm,0));
+  $("#historyRows").addEventListener("click",handleHistoryAction); $("#carCards").addEventListener("click",handleCarAction); $("#driverList").addEventListener("click",handleDriverAction);
 }
 
 function showView(id) {
-  document.querySelectorAll('.view').forEach((view) => view.classList.toggle('active', view.id === id));
-  document.querySelectorAll('.nav-item').forEach((item) => item.classList.toggle('active', item.dataset.view === id));
-  if (id === 'report') renderMonthlyReport();
-  if (id === 'calendar') renderCalendar();
-  if (id === 'history') renderHistory();
+  document.querySelectorAll(".view").forEach(v=>v.classList.toggle("active",v.id===id));
+  document.querySelectorAll(".nav [data-view]").forEach(v=>v.classList.toggle("active",v.dataset.view===id));
+  if(id==="history") renderHistory(); if(id==="report") renderReport(); if(id==="calendar") renderCalendar();
+  window.scrollTo({top:0,behavior:"smooth"});
 }
 
-function setToday() {
-  const today = dateKey(new Date());
-  ['#claimForm input[name="claimDate"]', '#maintenanceForm input[name="date"]'].forEach((selector) => {
-    const input = document.querySelector(selector);
-    if (input) input.value = today;
-  });
-}
-
-function setCurrentMonth() {
-  const month = monthKey(new Date());
-  ['#historyMonth', '#reportMonth', '#calendarMonth'].forEach((selector) => {
-    const input = document.querySelector(selector);
-    if (input && !input.value) input.value = month;
-  });
+function setDefaults() {
+  const today=dateKey(new Date()), month=today.slice(0,7);
+  $("#claimForm [name=claimDate]").value=today; $("#maintenanceForm [name=date]").value=today;
+  ["#historyMonth","#reportMonth","#calendarMonth"].forEach(s=>$(s).value=month);
 }
 
 function populateSelects() {
-  const allCarSelects = ['#carFilter', '#historyCar', '#reportCar', '#calendarCar']
-    .map((selector) => document.querySelector(selector))
-    .filter(Boolean);
-  const formCarSelects = ['#claimForm select[name="carId"]', '#maintenanceForm select[name="carId"]']
-    .map((selector) => document.querySelector(selector))
-    .filter(Boolean);
-  const previousValues = new Map([...allCarSelects, ...formCarSelects].map((select) => [select, select.value]));
-  [...allCarSelects, ...formCarSelects].forEach((select) => select.innerHTML = '');
-  allCarSelects.forEach((select) => select.add(new Option('รถทุกคัน', 'all')));
-  state.cars.forEach((car) => {
-    const label = `${car.Plate} - ${car.Model}`;
-    allCarSelects.forEach((select) => select.add(new Option(label, car['Car ID'])));
-    formCarSelects.forEach((select) => select.add(new Option(label, car['Car ID'])));
-  });
-  [...allCarSelects, ...formCarSelects].forEach((select) => {
-    const previous = previousValues.get(select);
-    if ([...select.options].some((option) => option.value === previous)) select.value = previous;
-  });
-  fillCarDefaults();
-  fillBudgetDefaults();
-  calculateClaimSmartFields();
-}
-
-function fillBudgetDefaults() {
-  const form = document.querySelector('#budgetForm');
-  if (!form) return;
-  const selected = document.querySelector('#carFilter').value || 'all';
-  const budget = getBudgetForSelectedCar();
-  const car = getCar(selected);
-  form.elements.carId.value = selected;
-  form.elements.weeklyBudgetLimit.value = budget.weeklyBudgetLimit || '';
-  form.elements.monthlyBudgetLimit.value = budget.monthlyBudgetLimit || '';
-  document.querySelector('#budgetScopeLabel').textContent = selected === 'all'
-    ? 'รถทุกคัน'
-    : `${car?.Plate || selected} · ${car?.Model || ''}`;
-}
-
-function fillCarDefaults() {
-  const id = document.querySelector('#claimForm select[name="carId"]').value;
-  const car = getCar(id);
-  if (!car) return;
-  document.querySelector('#claimForm input[name="salesName"]').value = car['Sales Name'] || '';
-  document.querySelector('#claimForm input[name="driverName"]').value = car['Driver Name'] || '';
-}
-
-function calculateClaimSmartFields() {
-  const form = document.querySelector('#claimForm');
-  if (!form) return;
-  const carId = form.elements.carId.value;
-  const claimId = form.elements.claimId.value;
-  const currentOdometer = Number(form.elements.odometerKm.value || 0);
-  const previousOdometer = getPreviousOdometer(carId, claimId, form.elements.claimDate.value);
-  const distanceInput = form.elements.distanceKm;
-  const amountInput = form.elements.amount;
-  const nextInput = form.elements.nextClaimDistanceKm;
-  const averageCost = getAverageCostPerKm(carId, claimId) || DEFAULT_COST_PER_KM;
-  let distance = Number(distanceInput.value || 0);
-
-  if (currentOdometer && previousOdometer && currentOdometer >= previousOdometer) {
-    distance = currentOdometer - previousOdometer;
-    distanceInput.value = distance;
-  }
-
-  if (distance > 0 && !amountInput.dataset.userEdited) {
-    amountInput.value = Math.round(distance * averageCost);
-    amountInput.dataset.auto = '1';
-  }
-
-  const amount = Number(amountInput.value || 0);
-  if (amount > 0 && averageCost > 0) {
-    nextInput.value = Math.max(0, Math.round(amount / averageCost));
-  }
-
-  renderClaimAssistant({ previousOdometer, currentOdometer, distance, averageCost, amount });
-}
-
-function renderClaimAssistant({ previousOdometer, currentOdometer, distance, averageCost, amount }) {
-  const el = document.querySelector('#claimAssistant');
-  if (!el) return;
-  const warnings = [];
-  if (currentOdometer && previousOdometer && currentOdometer < previousOdometer) {
-    warnings.push('เลขไมล์ปัจจุบันน้อยกว่ารอบก่อน กรุณาตรวจสอบอีกครั้ง');
-  }
-  const details = [
-    previousOdometer ? `เลขไมล์รอบก่อน ${formatter.format(previousOdometer)} กม.` : 'ยังไม่มีเลขไมล์รอบก่อนในระบบ',
-    distance ? `ระยะทางรอบนี้ ${km(distance)}` : 'รอเลขไมล์เพื่อคำนวณระยะทาง',
-    `ค่าเฉลี่ยอ้างอิง ${money(averageCost)}/กม.`,
-    amount ? `รอบถัดไปประมาณ ${km(Math.round(amount / (averageCost || 1)))}` : 'กรอกจำนวนเงินเพื่อคำนวณรอบถัดไป'
-  ];
-  el.className = `claim-assistant${warnings.length ? ' warn' : ''}`;
-  el.innerHTML = `<strong>ตัวช่วยคำนวณ</strong><div>${details.map((item) => `<span>${escapeHtml(item)}</span>`).join('')}</div>${warnings.map((item) => `<p>${escapeHtml(item)}</p>`).join('')}`;
-}
-
-function getPreviousOdometer(carId, excludeClaimId = '', beforeDate = '') {
-  const claim = getPreviousClaim(carId, excludeClaimId, beforeDate);
-  if (claim) return Number(claim['Odometer Km'] || 0);
-  const car = getCar(carId);
-  return Number(car?.['Current Odometer Km'] || 0);
-}
-
-function getPreviousClaim(carId, excludeClaimId = '', beforeDate = '') {
-  if (!carId) return null;
-  const before = beforeDate ? startOfDay(parseDate(beforeDate)).getTime() + 86400000 - 1 : Infinity;
-  return state.claims
-    .filter((claim) => claim['Car ID'] === carId && String(claim['Claim ID']) !== String(excludeClaimId || ''))
-    .filter((claim) => dateTime(claim['Claim Date']) <= before)
-    .sort((a, b) => dateTime(b['Claim Date']) - dateTime(a['Claim Date']) || dateTime(b['Created At']) - dateTime(a['Created At']))[0] || null;
-}
-
-function getAverageCostPerKm(carId = '', excludeClaimId = '') {
-  const carRows = state.claims.filter((claim) => (!carId || claim['Car ID'] === carId) && String(claim['Claim ID']) !== String(excludeClaimId || '') && Number(claim['Distance Km']) > 0 && Number(claim.Amount) > 0);
-  const rows = carRows.length ? carRows : state.claims.filter((claim) => Number(claim['Distance Km']) > 0 && Number(claim.Amount) > 0);
-  const totalAmount = rows.reduce((sum, claim) => sum + Number(claim.Amount || 0), 0);
-  const totalDistance = rows.reduce((sum, claim) => sum + Number(claim['Distance Km'] || 0), 0);
-  return totalDistance ? totalAmount / totalDistance : DEFAULT_COST_PER_KM;
+  const filters=["#carFilter","#historyCar","#reportCar","#calendarCar"].map($);
+  const forms=["#claimForm [name=carId]","#maintenanceForm [name=carId]"].map($);
+  const old=new Map([...filters,...forms].map(el=>[el,el.value]));
+  filters.forEach(el=>el.innerHTML='<option value="all">รถทุกคัน</option>'); forms.forEach(el=>el.innerHTML='<option value="">เลือกรถ</option>');
+  state.cars.forEach(car=>{const label=`${car.Plate||"-"} · ${car.Model||""}`;filters.forEach(el=>el.add(new Option(label,car["Car ID"])));forms.forEach(el=>el.add(new Option(label,car["Car ID"])));});
+  [...filters,...forms].forEach(el=>{if([...el.options].some(o=>o.value===old.get(el)))el.value=old.get(el);});
+  fillCarDefaults(); fillBudgetDefaults(); calculateClaim();
 }
 
 async function submitClaim(event) {
-  event.preventDefault();
-  if (!readyToSave_()) return;
-  const form = event.currentTarget;
-  calculateClaimSmartFields();
-  const payload = await formToPayload(form, ['odometerPhoto', 'receipt', 'transferSlip']);
-  const isEdit = Boolean(payload.claimId);
-  if (!isEdit && !payload.odometerPhoto) {
-    showNotice('กรุณาแนบรูปหน้าไมล์รถ', 'error');
-    return;
-  }
-  showNotice(isEdit ? 'กำลังแก้ไขรายการ...' : 'กำลังบันทึกรายการและอัปโหลดไฟล์...');
-  const runner = google.script.run
-    .withSuccessHandler(() => {
-      form.reset();
-      resetClaimFormMode();
-      setToday();
-      loadData();
-      showView('history');
-    })
-    .withFailureHandler((error) => showNotice(error.message || String(error), 'error'));
-  if (isEdit) {
-    runner.updateClaim(payload);
-  } else {
-    runner.saveClaim(payload);
-  }
-}
-
-function handleHistoryAction(event) {
-  const button = event.target.closest('[data-action]');
-  if (!button) return;
-  const claimId = button.dataset.id;
-  if (button.dataset.action === 'edit') editClaim(claimId);
-  if (button.dataset.action === 'delete') deleteClaimFromHistory(claimId);
-}
-
-function editClaim(claimId) {
-  const claim = state.claims.find((item) => String(item['Claim ID']) === String(claimId));
-  if (!claim) {
-    showNotice('ไม่พบรายการที่ต้องการแก้ไข', 'error');
-    return;
-  }
-  const form = document.querySelector('#claimForm');
-  form.elements.claimId.value = claim['Claim ID'] || '';
-  form.elements.salesName.value = claim['Sales Name'] || '';
-  form.elements.carId.value = claim['Car ID'] || '';
-  form.elements.driverName.value = claim['Driver Name'] || '';
-  form.elements.claimDate.value = toInputDate(claim['Claim Date']);
-  form.elements.odometerKm.value = claim['Odometer Km'] || '';
-  form.elements.distanceKm.value = claim['Distance Km'] || '';
-  form.elements.amount.value = claim.Amount || '';
-  form.elements.nextClaimDistanceKm.value = claim['Next Claim Distance Km'] || '';
-  form.elements.paymentStatus.value = claim['Payment Status'] || 'รอตรวจเอกสาร';
-  form.elements.note.value = claim.Note || '';
-  form.elements.amount.dataset.userEdited = '1';
-  calculateClaimSmartFields();
-  document.querySelector('#claimSubmitText').textContent = 'บันทึกการแก้ไข';
-  showView('claim');
-  showNotice('กำลังแก้ไขรายการเดิม ถ้าไม่แนบไฟล์ใหม่ ระบบจะใช้ไฟล์เดิม', 'ok');
-}
-
-function deleteClaimFromHistory(claimId) {
-  const claim = state.claims.find((item) => String(item['Claim ID']) === String(claimId));
-  if (!claim) {
-    showNotice('ไม่พบรายการที่ต้องการลบ', 'error');
-    return;
-  }
-  if (!confirm(`ลบรายการเบิกวันที่ ${formatDate(claim['Claim Date'])} ยอด ${money(claim.Amount)} ใช่ไหม?`)) return;
-  showNotice('กำลังลบรายการ...');
-  google.script.run
-    .withSuccessHandler(() => loadData())
-    .withFailureHandler((error) => showNotice(error.message || String(error), 'error'))
-    .deleteClaim(claimId);
-}
-
-function resetClaimFormMode() {
-  document.querySelector('#claimForm input[name="claimId"]').value = '';
-  const amountInput = document.querySelector('#claimForm input[name="amount"]');
-  if (amountInput) {
-    delete amountInput.dataset.userEdited;
-    delete amountInput.dataset.auto;
-  }
-  document.querySelector('#claimSubmitText').textContent = 'บันทึกรายการ';
-  calculateClaimSmartFields();
+  event.preventDefault(); const form=event.currentTarget; const button=$("#claimSubmitText");
+  try {
+    setBusy(button,true); calculateClaim(); const payload=await formToPayload(form,["odometerPhoto","receipt","transferSlip"]); const editing=Boolean(payload.claimId);
+    if(!editing&&!payload.odometerPhoto) throw new Error("กรุณาแนบรูปหน้าไมล์รถ");
+    showNotice(editing?"กำลังบันทึกการแก้ไข...":"กำลังบันทึกและอัปโหลดไฟล์...");
+    await callApi(editing?"updateClaim":"saveClaim",payload); form.reset(); resetClaimForm(); setDefaults(); await loadData(); showView("history");
+  } catch(error) { showNotice(error.message,"error"); } finally { setBusy(button,false); }
 }
 
 async function submitCar(event) {
-  event.preventDefault();
-  if (!readyToSave_()) return;
-  const form = event.currentTarget;
-  const payload = await formToPayload(form, ['carPhoto']);
-  showNotice(payload.carId ? 'กำลังบันทึกข้อมูลรถ...' : 'กำลังเพิ่มข้อมูลรถ...');
-  google.script.run
-    .withSuccessHandler(() => { form.reset(); resetCarFormMode(); loadData(); })
-    .withFailureHandler((error) => showNotice(error.message || String(error), 'error'))
-    .saveCar(payload);
+  event.preventDefault(); const form=event.currentTarget, button=$("#carSubmitText");
+  try {setBusy(button,true);const payload=await formToPayload(form,["carPhoto"]);showNotice(payload.carId?"กำลังแก้ไขข้อมูลรถ...":"กำลังเพิ่มรถ...");await callApi("saveCar",payload);form.reset();resetCarForm();await loadData();showView("cars");}
+  catch(error){showNotice(error.message,"error");}finally{setBusy(button,false);}
 }
 
 async function submitDriver(event) {
-  event.preventDefault();
-  if (!readyToSave_()) return;
-  const form = event.currentTarget;
-  const payload = await formToPayload(form, []);
-  showNotice(payload.driverId ? 'กำลังบันทึกข้อมูลคนขับ...' : 'กำลังเพิ่มคนขับ...');
-  google.script.run
-    .withSuccessHandler(() => { form.reset(); resetDriverFormMode(); loadData(); })
-    .withFailureHandler((error) => showNotice(error.message || String(error), 'error'))
-    .saveDriver(payload);
-}
-
-function handleCarAction(event) {
-  const button = event.target.closest('[data-action]');
-  if (!button) return;
-  const carId = button.dataset.id;
-  if (button.dataset.action === 'edit-car') editCar(carId);
-  if (button.dataset.action === 'delete-car') deleteCar(carId);
-}
-
-function editCar(carId) {
-  const car = getCar(carId);
-  if (!car) {
-    showNotice('ไม่พบข้อมูลรถที่ต้องการแก้ไข', 'error');
-    return;
-  }
-  const form = document.querySelector('#carForm');
-  form.elements.carId.value = car['Car ID'] || '';
-  form.elements.carPhotoUrl.value = car['Car Photo URL'] || '';
-  form.elements.plate.value = car.Plate || '';
-  form.elements.model.value = car.Model || '';
-  form.elements.color.value = car.Color || '';
-  form.elements.salesName.value = car['Sales Name'] || '';
-  form.elements.driverName.value = car['Driver Name'] || '';
-  form.elements.status.value = car.Status || 'ใช้งาน';
-  form.elements.currentOdometerKm.value = car['Current Odometer Km'] || '';
-  form.elements.nextServiceKm.value = car['Next Service Km'] || '';
-  document.querySelector('#carSubmitText').textContent = 'บันทึกข้อมูลรถ';
-  document.querySelector('#cancelEditCar').hidden = false;
-  showNotice('กำลังแก้ไขข้อมูลรถ ถ้าไม่แนบรูปรถใหม่จะใช้รูปเดิม', 'ok');
-}
-
-function deleteCar(carId) {
-  const car = getCar(carId);
-  if (!car) return showNotice('ไม่พบข้อมูลรถที่ต้องการลบ', 'error');
-  if (!confirm(`ลบข้อมูลรถ ${car.Plate} · ${car.Model} ใช่ไหม? ประวัติเบิกเดิมจะยังคงอยู่`)) return;
-  if (!readyToSave_()) return;
-  showNotice('กำลังลบข้อมูลรถ...');
-  google.script.run
-    .withSuccessHandler(() => loadData())
-    .withFailureHandler((error) => showNotice(error.message || String(error), 'error'))
-    .deleteCar(carId);
-}
-
-function resetCarFormMode() {
-  const form = document.querySelector('#carForm');
-  if (!form) return;
-  form.elements.carId.value = '';
-  form.elements.carPhotoUrl.value = '';
-  document.querySelector('#carSubmitText').textContent = 'เพิ่มรถ';
-  document.querySelector('#cancelEditCar').hidden = true;
-}
-
-function handleDriverAction(event) {
-  const button = event.target.closest('[data-action]');
-  if (!button) return;
-  const driverId = button.dataset.id;
-  if (button.dataset.action === 'edit-driver') editDriver(driverId);
-  if (button.dataset.action === 'delete-driver') deleteDriver(driverId);
-}
-
-function editDriver(driverId) {
-  const driver = state.drivers.find((item) => String(item['Driver ID']) === String(driverId));
-  if (!driver) {
-    showNotice('ไม่พบข้อมูลคนขับที่ต้องการแก้ไข', 'error');
-    return;
-  }
-  const form = document.querySelector('#driverForm');
-  form.elements.driverId.value = driver['Driver ID'] || '';
-  form.elements.driverName.value = driver['Driver Name'] || '';
-  form.elements.phone.value = driver.Phone || '';
-  form.elements.area.value = driver.Area || '';
-  form.elements.licenseNo.value = driver['License No'] || '';
-  form.elements.note.value = driver.Note || '';
-  document.querySelector('#driverSubmitText').textContent = 'บันทึกคนขับ';
-  document.querySelector('#cancelEditDriver').hidden = false;
-  showNotice('กำลังแก้ไขข้อมูลคนขับ', 'ok');
-}
-
-function deleteDriver(driverId) {
-  const driver = state.drivers.find((item) => String(item['Driver ID']) === String(driverId));
-  if (!driver) return showNotice('ไม่พบข้อมูลคนขับที่ต้องการลบ', 'error');
-  if (!confirm(`ลบข้อมูลคนขับ ${driver['Driver Name']} ใช่ไหม?`)) return;
-  if (!readyToSave_()) return;
-  showNotice('กำลังลบข้อมูลคนขับ...');
-  google.script.run
-    .withSuccessHandler(() => loadData())
-    .withFailureHandler((error) => showNotice(error.message || String(error), 'error'))
-    .deleteDriver(driverId);
-}
-
-function resetDriverFormMode() {
-  const form = document.querySelector('#driverForm');
-  if (!form) return;
-  form.elements.driverId.value = '';
-  document.querySelector('#driverSubmitText').textContent = 'เพิ่มคนขับ';
-  document.querySelector('#cancelEditDriver').hidden = true;
+  event.preventDefault(); const form=event.currentTarget, button=$("#driverSubmitText");
+  try {setBusy(button,true);const payload=await formToPayload(form,[]);showNotice(payload.driverId?"กำลังแก้ไขคนขับ...":"กำลังเพิ่มคนขับ...");await callApi("saveDriver",payload);form.reset();resetDriverForm();await loadData();showView("cars");}
+  catch(error){showNotice(error.message,"error");}finally{setBusy(button,false);}
 }
 
 async function submitMaintenance(event) {
-  event.preventDefault();
-  if (!readyToSave_()) return;
-  showNotice('กำลังบันทึกซ่อมบำรุง...');
-  const form = event.currentTarget;
-  const payload = await formToPayload(form, ['receipt', 'maintenancePhoto', 'maintenanceDocument']);
-  google.script.run
-    .withSuccessHandler(() => { form.reset(); setToday(); loadData(); })
-    .withFailureHandler((error) => showNotice(error.message || String(error), 'error'))
-    .saveMaintenance(payload);
+  event.preventDefault(); const form=event.currentTarget, button=form.querySelector("button[type=submit]");
+  try {setBusy(button,true);const payload=await formToPayload(form,["receipt","maintenancePhoto","maintenanceDocument"]);showNotice("กำลังบันทึกซ่อมบำรุง...");await callApi("saveMaintenance",payload);form.reset();setDefaults();await loadData();showView("maintenance");}
+  catch(error){showNotice(error.message,"error");}finally{setBusy(button,false);}
 }
 
-function submitBudgetSettings(event) {
-  event.preventDefault();
-  const payload = Object.fromEntries(new FormData(event.currentTarget).entries());
-  const scope = payload.carId && payload.carId !== 'all' ? payload.carId : 'all';
-  if (!state.settings.budgetsByCar) state.settings.budgetsByCar = {};
-  state.settings.budgetsByCar[scope] = {
-    weeklyBudgetLimit: Number(payload.weeklyBudgetLimit || 0),
-    monthlyBudgetLimit: Number(payload.monthlyBudgetLimit || 0)
-  };
-  renderBudgetDashboard();
-  if (!readyToSave_()) return;
-  showNotice('กำลังบันทึกวงเงิน...');
-  google.script.run
-    .withSuccessHandler((result) => {
-      state.settings = result.settings || state.settings;
-      fillBudgetDefaults();
-      renderBudgetDashboard();
-      showNotice('บันทึกวงเงินแล้ว', 'ok');
-      setTimeout(clearNotice, 1500);
-    })
-    .withFailureHandler((error) => showNotice(error.message || String(error), 'error'))
-    .saveBudgetSettings(payload);
+async function submitBudget(event) {
+  event.preventDefault(); const form=event.currentTarget, button=form.querySelector("button[type=submit]");
+  try {setBusy(button,true);const payload=Object.fromEntries(new FormData(form));showNotice("กำลังบันทึกวงเงิน...");const result=await callApi("saveBudgetSettings",payload);state.settings=normalizeSettings(result.settings||result);fillBudgetDefaults();renderBudget();renderDashboard();showNotice("บันทึกวงเงินแล้ว","ok");}
+  catch(error){showNotice(error.message,"error");}finally{setBusy(button,false);}
 }
 
-function readyToSave_() {
-  if (!window.google || !google.script || !google.script.run) {
-    showNotice('ยังไม่พร้อมบันทึก กรุณาเปิดจากลิงก์ Web App /exec และตรวจการ Deploy', 'error');
-    return false;
-  }
-  return true;
-}
-
-async function formToPayload(form, fileFields) {
-  const fd = new FormData(form);
-  const payload = {};
-  for (const [key, value] of fd.entries()) {
-    if (!(value instanceof File)) payload[key] = value;
-  }
-  for (const key of fileFields) {
-    const file = form.elements[key]?.files?.[0];
-    if (file) payload[key] = await fileToDataUrl(file);
-  }
+async function formToPayload(form,fileNames) {
+  const payload={}; for(const [key,value] of new FormData(form).entries()) if(!(value instanceof File)) payload[key]=value;
+  for(const name of fileNames){const file=form.elements[name]?.files?.[0];if(file){if(file.size>MAX_FILE_BYTES)throw new Error(`ไฟล์ ${file.name} เกิน 8 MB`);payload[name]=await fileToDataUrl(file);}}
   return payload;
 }
 
-function fileToDataUrl(file) {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve({ name: file.name, type: file.type, dataUrl: reader.result });
-    reader.onerror = reject;
-    reader.readAsDataURL(file);
-  });
-}
+function fileToDataUrl(file){return new Promise((resolve,reject)=>{const r=new FileReader();r.onload=()=>resolve({name:file.name,type:file.type||"application/octet-stream",dataUrl:r.result});r.onerror=()=>reject(new Error(`อ่านไฟล์ ${file.name} ไม่สำเร็จ`));r.readAsDataURL(file);});}
 
-function renderAll() {
-  renderDashboard();
-  renderVehicleSummary(document.querySelector('[data-period].active')?.dataset.period || 'week');
-  fillBudgetDefaults();
-  renderBudgetDashboard();
-  renderSingleCarDashboard();
-  renderHistory();
-  renderMonthlyReport();
-  renderCalendar();
-  renderMaintenance();
-  renderCars();
-  renderDrivers();
-}
+function handleHistoryAction(event){const btn=event.target.closest("[data-action]");if(!btn)return;if(btn.dataset.action==="edit-claim")editClaim(btn.dataset.id);if(btn.dataset.action==="delete-claim")deleteClaim(btn.dataset.id);}
+function editClaim(id){const c=state.claims.find(x=>String(x["Claim ID"])===String(id));if(!c)return;const f=$("#claimForm");f.elements.claimId.value=c["Claim ID"]||"";f.elements.salesName.value=c["Sales Name"]||"";f.elements.carId.value=c["Car ID"]||"";f.elements.driverName.value=c["Driver Name"]||"";f.elements.claimDate.value=dateKey(c["Claim Date"]);f.elements.odometerKm.value=c["Odometer Km"]||"";f.elements.distanceKm.value=c["Distance Km"]||"";f.elements.amount.value=c.Amount||"";f.elements.amount.dataset.edited="1";f.elements.nextClaimDistanceKm.value=c["Next Claim Distance Km"]||"";f.elements.paymentStatus.value=c["Payment Status"]||"รอตรวจเอกสาร";f.elements.note.value=c.Note||"";$("#claimSubmitText").textContent="บันทึกการแก้ไข";calculateClaim();showView("claim");showNotice("กำลังแก้ไขรายการเดิม — ไม่แนบไฟล์ใหม่จะใช้ไฟล์เดิม","ok");}
+async function deleteClaim(id){const c=state.claims.find(x=>String(x["Claim ID"])===String(id));if(!c||!confirm(`ลบรายการวันที่ ${formatDate(c["Claim Date"])} ยอด ${money(c.Amount)} ใช่ไหม?`))return;try{showNotice("กำลังลบรายการ...");await callApi("deleteClaim",{claimId:id});await loadData();}catch(error){showNotice(error.message,"error");}}
+function resetClaimForm(){const f=$("#claimForm");f.elements.claimId.value="";delete f.elements.amount.dataset.edited;$("#claimSubmitText").textContent="บันทึกรายการ";setDefaults();calculateClaim();}
 
-function getCar(id) {
-  return state.cars.find((car) => car['Car ID'] === id);
-}
+function handleCarAction(event){const btn=event.target.closest("[data-action]");if(!btn)return;if(btn.dataset.action==="edit-car")editCar(btn.dataset.id);if(btn.dataset.action==="delete-car")deleteCar(btn.dataset.id);}
+function editCar(id){const c=getCar(id);if(!c)return;const f=$("#carForm");f.elements.carId.value=c["Car ID"]||"";f.elements.carPhotoUrl.value=c["Car Photo URL"]||"";f.elements.plate.value=c.Plate||"";f.elements.model.value=c.Model||"";f.elements.color.value=c.Color||"";f.elements.salesName.value=c["Sales Name"]||"";f.elements.driverName.value=c["Driver Name"]||"";f.elements.status.value=c.Status||"ใช้งาน";f.elements.currentOdometerKm.value=c["Current Odometer Km"]||"";f.elements.nextServiceKm.value=c["Next Service Km"]||"";$("#carSubmitText").textContent="บันทึกข้อมูลรถ";$("#cancelEditCar").hidden=false;showNotice("กำลังแก้ไขข้อมูลรถ","ok");}
+async function deleteCar(id){const c=getCar(id);if(!c||!confirm(`ลบรถ ${c.Plate} ใช่ไหม? ประวัติเดิมจะยังอยู่`))return;try{showNotice("กำลังลบรถ...");await callApi("deleteCar",{carId:id});await loadData();}catch(error){showNotice(error.message,"error");}}
+function resetCarForm(){const f=$("#carForm");f.elements.carId.value="";f.elements.carPhotoUrl.value="";$("#carSubmitText").textContent="เพิ่มรถ";$("#cancelEditCar").hidden=true;}
 
-function selectedClaims() {
-  const selected = document.querySelector('#carFilter')?.value || 'all';
-  return selected === 'all' ? state.claims : state.claims.filter((claim) => claim['Car ID'] === selected);
-}
+function handleDriverAction(event){const btn=event.target.closest("[data-action]");if(!btn)return;if(btn.dataset.action==="edit-driver")editDriver(btn.dataset.id);if(btn.dataset.action==="delete-driver")deleteDriver(btn.dataset.id);}
+function editDriver(id){const d=state.drivers.find(x=>String(x["Driver ID"])===String(id));if(!d)return;const f=$("#driverForm");f.elements.driverId.value=d["Driver ID"]||"";f.elements.driverName.value=d["Driver Name"]||"";f.elements.phone.value=d.Phone||"";f.elements.area.value=d.Area||"";f.elements.licenseNo.value=d["License No"]||"";f.elements.note.value=d.Note||"";$("#driverSubmitText").textContent="บันทึกคนขับ";$("#cancelEditDriver").hidden=false;showNotice("กำลังแก้ไขข้อมูลคนขับ","ok");}
+async function deleteDriver(id){const d=state.drivers.find(x=>String(x["Driver ID"])===String(id));if(!d||!confirm(`ลบคนขับ ${d["Driver Name"]} ใช่ไหม?`))return;try{showNotice("กำลังลบคนขับ...");await callApi("deleteDriver",{driverId:id});await loadData();}catch(error){showNotice(error.message,"error");}}
+function resetDriverForm(){const f=$("#driverForm");f.elements.driverId.value="";$("#driverSubmitText").textContent="เพิ่มคนขับ";$("#cancelEditDriver").hidden=true;}
 
-function inPeriod(claim, period) {
-  const date = parseDate(claim['Claim Date']);
-  const now = new Date();
-  if (period === 'all') return true;
-  if (period === 'month') return date.getFullYear() === now.getFullYear() && date.getMonth() === now.getMonth();
-  const week = getWeekRange(now);
-  return date >= week.start && date <= week.end;
-}
+function calculateClaim(){const f=$("#claimForm"),carId=f.elements.carId.value,claimId=f.elements.claimId.value,current=Number(f.elements.odometerKm.value||0),previous=getPreviousOdometer(carId,claimId,f.elements.claimDate.value),avg=getAverageCost(carId,claimId)||DEFAULT_COST_PER_KM;let distance=Number(f.elements.distanceKm.value||0);if(current&&previous&&current>=previous){distance=current-previous;f.elements.distanceKm.value=distance;}if(distance>0&&!f.elements.amount.dataset.edited)f.elements.amount.value=Math.round(distance*avg);const amount=Number(f.elements.amount.value||0);if(amount&&avg)f.elements.nextClaimDistanceKm.value=Math.round(amount/avg);const warnings=[];if(current&&previous&&current<previous)warnings.push("เลขไมล์ปัจจุบันน้อยกว่ารอบก่อน");$("#claimAssistant").className=`assistant${warnings.length?" warn":""}`;$("#claimAssistant").innerHTML=`<strong>ตัวช่วยคำนวณ</strong><div><span>${previous?`เลขไมล์รอบก่อน ${km(previous)}`:"ยังไม่มีเลขไมล์รอบก่อน"}</span><span>${distance?`รอบนี้ ${km(distance)}`:"รอข้อมูลระยะทาง"}</span><span>ค่าเฉลี่ยอ้างอิง ${money(avg)}/กม.</span></div>${warnings.map(w=>`<p>${escapeHtml(w)}</p>`).join("")}`;}
+function getPreviousOdometer(carId,excludeId,before){const c=getPreviousClaim(carId,excludeId,before);return c?Number(c["Odometer Km"]||0):Number(getCar(carId)?.["Current Odometer Km"]||0);}
+function getPreviousClaim(carId,excludeId,before){if(!carId)return null;const limit=before?endOfDay(before).getTime():Infinity;return state.claims.filter(c=>c["Car ID"]===carId&&String(c["Claim ID"])!==String(excludeId||"")&&dateTime(c["Claim Date"])<=limit).sort(sortNewest)[0]||null;}
+function getAverageCost(carId,excludeId){let rows=state.claims.filter(c=>(!carId||c["Car ID"]===carId)&&String(c["Claim ID"])!==String(excludeId||"")&&Number(c["Distance Km"])>0&&Number(c.Amount)>0);if(!rows.length)rows=state.claims.filter(c=>Number(c["Distance Km"])>0&&Number(c.Amount)>0);const s=summarize(rows);return s.distance?s.amount/s.distance:DEFAULT_COST_PER_KM;}
+function fillCarDefaults(){const f=$("#claimForm"),c=getCar(f.elements.carId.value);if(!c)return;f.elements.salesName.value=c["Sales Name"]||"";f.elements.driverName.value=c["Driver Name"]||"";}
 
-function renderDashboard() {
-  const current = selectedClaims().filter((claim) => inPeriod(claim, 'month'));
-  const totalAmount = current.reduce((sum, claim) => sum + Number(claim.Amount || 0), 0);
-  const totalKm = current.reduce((sum, claim) => sum + Number(claim['Distance Km'] || 0), 0);
-  const serviceCount = state.cars.filter((car) => car.Status !== 'ใช้งาน').length;
-  const budgetWarnings = getBudgetWarnings();
-  document.querySelector('#monthAmount').textContent = money(totalAmount);
-  document.querySelector('#monthKm').textContent = km(totalKm);
-  document.querySelector('#avgCost').textContent = totalKm ? money(Math.round(totalAmount / totalKm)) : '฿0';
-  document.querySelector('#serviceAlert').textContent = `${serviceCount} รายการ`;
-  const budgetWarningEl = document.querySelector('#budgetWarningCount');
-  if (budgetWarningEl) budgetWarningEl.textContent = `${budgetWarnings.length} รายการ`;
-  renderNextClaim();
-}
+function renderAll(){renderDashboard();renderVehicleSummary();fillBudgetDefaults();renderBudget();renderHistory();renderReport();renderCalendar();renderMaintenance();renderCars();renderDrivers();}
+function selectedClaims(){const id=$("#carFilter").value||"all";return id==="all"?state.claims:state.claims.filter(c=>c["Car ID"]===id);}
+function inPeriod(item,period,dateField="Claim Date"){const date=parseDate(item[dateField]),now=new Date();if(period==="all")return true;if(period==="month")return date.getFullYear()===now.getFullYear()&&date.getMonth()===now.getMonth();const range=weekRange(now);return date>=range.start&&date<=range.end;}
+function renderDashboard(){const rows=selectedClaims().filter(c=>inPeriod(c,"month")),sum=summarize(rows),warnings=getBudgetWarnings();$("#monthAmount").textContent=money(sum.amount);$("#monthKm").textContent=km(sum.distance);$("#avgCost").textContent=sum.distance?money(sum.amount/sum.distance):"฿0";$("#budgetWarningCount").textContent=`${warnings.length} รายการ`;$("#serviceAlert").textContent=`${state.cars.filter(c=>c.Status&&c.Status!=="ใช้งาน").length} รายการ`;renderNextClaim();}
+function renderVehicleSummary(){const html=state.cars.map(c=>{const rows=state.claims.filter(x=>x["Car ID"]===c["Car ID"]&&inPeriod(x,"month")),s=summarize(rows),latest=rows.sort(sortNewest)[0];return `<article class="vehicle-row"><div><strong>${escapeHtml(c.Plate||"-")} · ${escapeHtml(c.Model||"")}</strong><small>${escapeHtml(c["Driver Name"]||"-")} / ${escapeHtml(c["Sales Name"]||"-")}</small></div><div><small>ยอดเบิก</small><strong>${money(s.amount)}</strong></div><div><small>ระยะทาง</small><strong>${km(s.distance)}</strong></div><span class="badge">${latest?km(latest["Next Claim Distance Km"]):"ยังไม่มีรอบ"}</span></article>`;}).join("");$("#vehicleSummary").innerHTML=html||'<p class="empty">ยังไม่มีข้อมูลรถ</p>';}
+function renderNextClaim(){const latest=[...selectedClaims()].sort(sortNewest)[0];if(!latest){$("#nextClaimCard").innerHTML='<p class="empty">ยังไม่มีรายการเบิก</p>';$("#nextDistanceSummary").textContent="-";return;}const c=getCar(latest["Car ID"])||{};$("#nextClaimCard").innerHTML=`<span class="badge">${escapeHtml(c.Plate||latest.Plate||"-")}</span><h3 style="font-size:34px;margin:12px 0 5px">${km(latest["Next Claim Distance Km"])}</h3><p class="muted">ล่าสุด ${formatDate(latest["Claim Date"])} · วิ่ง ${km(latest["Distance Km"])} · เลขไมล์ ${numberFormat.format(latest["Odometer Km"]||0)}</p>`;$("#nextDistanceSummary").textContent=km(latest["Next Claim Distance Km"]);}
 
-function renderVehicleSummary(period) {
-  document.querySelector('#vehicleSummary').innerHTML = state.cars.map((car) => {
-    const rows = state.claims.filter((claim) => claim['Car ID'] === car['Car ID'] && inPeriod(claim, period));
-    const amount = rows.reduce((sum, claim) => sum + Number(claim.Amount || 0), 0);
-    const distance = rows.reduce((sum, claim) => sum + Number(claim['Distance Km'] || 0), 0);
-    const next = rows[0]?.['Next Claim Distance Km'] || 0;
-    return `<article class="vehicle-row"><div><strong>${car.Plate} · ${car.Model}</strong><small>${car['Driver Name'] || '-'} / ${car['Sales Name'] || '-'}</small></div><div><small>ยอดเบิก</small><strong>${money(amount)}</strong></div><div><small>ระยะทาง</small><strong>${km(distance)}</strong></div><span class="badge">${next ? km(next) : 'ยังไม่มีรอบ'}</span></article>`;
-  }).join('');
-}
+function fillBudgetDefaults(){const f=$("#budgetForm"),id=$("#carFilter").value||"all",b=getBudget(),c=getCar(id);f.elements.carId.value=id;f.elements.weeklyBudgetLimit.value=b.weeklyBudgetLimit||"";f.elements.monthlyBudgetLimit.value=b.monthlyBudgetLimit||"";$("#budgetScopeLabel").textContent=id==="all"?"รถทุกคัน":`${c?.Plate||id} · ${c?.Model||""}`;}
+function getBudget(){const id=$("#carFilter").value||"all",all=state.settings.budgetsByCar||{};return all[id]||all.all||{weeklyBudgetLimit:state.settings.weeklyBudgetLimit||0,monthlyBudgetLimit:state.settings.monthlyBudgetLimit||0};}
+function renderBudget(){const b=getBudget(),rows=selectedClaims(),week=rows.filter(c=>inPeriod(c,"week")).reduce((s,c)=>s+Number(c.Amount||0),0),month=rows.filter(c=>inPeriod(c,"month")).reduce((s,c)=>s+Number(c.Amount||0),0);$("#budgetDashboard").innerHTML=budgetCard("รายสัปดาห์",b.weeklyBudgetLimit,week)+budgetCard("รายเดือน",b.monthlyBudgetLimit,month);const w=getBudgetWarnings();$("#budgetAlert").className=`budget-alert${w.length?" show":""}`;$("#budgetAlert").innerHTML=w.length?`<strong>เกินวงเงิน</strong> ${w.map(x=>`${x.label} ${money(Math.abs(x.remaining))}`).join(" · ")}`:"";}
+function budgetCard(label,limit,spent){limit=Number(limit||0);const remaining=limit-spent,pct=limit?Math.min(100,spent/limit*100):0;return `<article class="budget-card${limit&&remaining<0?" over":""}"><span>${label}</span><strong>${limit?money(limit):"ยังไม่ตั้งวงเงิน"}</strong><div class="progress"><span style="width:${pct}%"></span></div><div class="budget-values"><div><small>เบิกแล้ว</small><strong>${money(spent)}</strong></div><div><small>${remaining<0?"เกิน":"คงเหลือ"}</small><strong>${limit?money(Math.abs(remaining)):"-"}</strong></div></div></article>`;}
+function getBudgetWarnings(){const b=getBudget(),rows=selectedClaims();return [{label:"รายสัปดาห์",limit:Number(b.weeklyBudgetLimit||0),spent:rows.filter(c=>inPeriod(c,"week")).reduce((s,c)=>s+Number(c.Amount||0),0)},{label:"รายเดือน",limit:Number(b.monthlyBudgetLimit||0),spent:rows.filter(c=>inPeriod(c,"month")).reduce((s,c)=>s+Number(c.Amount||0),0)}].map(x=>({...x,remaining:x.limit-x.spent})).filter(x=>x.limit&&x.remaining<0);}
 
-function renderNextClaim() {
-  const latest = selectedClaims()[0];
-  if (!latest) {
-    document.querySelector('#nextClaimCard').innerHTML = '<span>ยังไม่มีรายการเบิก</span><strong>-</strong><p>เริ่มบันทึกรอบแรกได้เลย</p>';
-    document.querySelector('#nextDistanceSummary').textContent = '-';
-    return;
-  }
-  const car = getCar(latest['Car ID']) || {};
-  const progress = Math.min(92, Math.round((Number(latest['Distance Km'] || 0) / Number(latest['Next Claim Distance Km'] || 1)) * 100));
-  document.querySelector('#nextClaimCard').innerHTML = `<span>${car.Plate || latest.Plate} · ${car.Model || ''}</span><strong>${km(latest['Next Claim Distance Km'])}</strong><div class="bar"><span style="width:${progress}%"></span></div><p>รอบล่าสุดวิ่ง ${km(latest['Distance Km'])} · เลขไมล์ ${formatter.format(latest['Odometer Km'] || 0)}</p>`;
-  document.querySelector('#nextDistanceSummary').textContent = km(latest['Next Claim Distance Km']);
-}
+function updateHistoryFilters(){const p=$("#historyPeriod").value;$("#historyMonthWrap").classList.toggle("hidden",p!=="month");$("#historyRangeWrap").classList.toggle("hidden",p!=="custom");}
+function filteredHistory(){const car=$("#historyCar").value,period=$("#historyPeriod").value,q=$("#historySearch").value.trim().toLowerCase();let rows=[...state.claims];if(car!=="all")rows=rows.filter(c=>c["Car ID"]===car);if(period==="week")rows=rows.filter(c=>inPeriod(c,"week"));if(period==="month")rows=rows.filter(c=>monthKey(c["Claim Date"])===$("#historyMonth").value);if(period==="custom")rows=rows.filter(c=>inRange(c["Claim Date"],$("#historyStart").value,$("#historyEnd").value));if(q)rows=rows.filter(c=>[c["Claim ID"],c["Sales Name"],c.Plate,c["Driver Name"],c["Payment Status"],c.Note,c.Amount].some(v=>String(v||"").toLowerCase().includes(q)));return rows.sort(sortNewest);}
+function renderHistory(){updateHistoryFilters();const rows=filteredHistory(),s=summarize(rows);$("#historySummary").innerHTML=`<strong>${rows.length} รายการ</strong><span>${money(s.amount)} · ${km(s.distance)}</span>`;$("#historyRows").innerHTML=rows.length?rows.map(c=>{const docs=[docLink(c["Odometer Photo URL"],"หน้าไมล์"),docLink(c["Receipt URL"],"ใบเสร็จ"),docLink(c["Transfer Slip URL"],"สลิป")].filter(Boolean).join("");return `<tr><td>${formatDate(c["Claim Date"])}<br><small>${escapeHtml(c["Claim ID"]||"")}</small></td><td><strong>${escapeHtml(c.Plate||"-")}</strong><small>${escapeHtml(c["Driver Name"]||"-")} · ${escapeHtml(c["Sales Name"]||"-")}</small></td><td>${numberFormat.format(c["Odometer Km"]||0)}<br><small>${km(c["Distance Km"])}</small></td><td><strong>${money(c.Amount)}</strong><br><small>ถัดไป ${km(c["Next Claim Distance Km"])}</small></td><td><div class="doc-links">${docs||"ยังไม่แนบ"}</div></td><td><span class="badge${c["Payment Status"]==="โอนแล้ว"?"":" warn"}">${escapeHtml(c["Payment Status"]||"-")}</span></td><td>${escapeHtml(c.Note||"-")}</td><td><div class="row-actions"><button class="btn ghost small" data-action="edit-claim" data-id="${escapeAttr(c["Claim ID"])}">แก้ไข</button><button class="btn danger small" data-action="delete-claim" data-id="${escapeAttr(c["Claim ID"])}">ลบ</button></div></td></tr>`;}).join(""):'<tr><td colspan="8" class="empty">ไม่พบข้อมูล</td></tr>';}
 
-function renderHistory() {
-  updateHistoryFilterVisibility();
-  const rows = getFilteredHistoryRows();
-  const summary = summarizeClaims(rows);
-  const summaryEl = document.querySelector('#historySummary');
-  if (summaryEl) summaryEl.innerHTML = `<strong>${formatter.format(rows.length)} รายการ</strong><span>${money(summary.amount)} · ${km(summary.distance)} · เฉลี่ย ${summary.distance ? money(Math.round(summary.amount / summary.distance)) + '/กม.' : '-'}</span>`;
-  document.querySelector('#historyRows').innerHTML = rows.length ? rows.map((claim) => {
-    const docs = [
-      docLink(claim['Odometer Photo URL'], 'รูปหน้าไมล์'),
-      docLink(claim['Receipt URL'], 'ใบเสร็จ'),
-      docLink(claim['Transfer Slip URL'], 'สลิป')
-    ].filter(Boolean).join('');
-    const warn = claim['Payment Status'] === 'โอนแล้ว' ? '' : ' warn';
-    const costPerKm = Number(claim['Distance Km']) ? Number(claim.Amount || 0) / Number(claim['Distance Km']) : 0;
-    return `<tr>
-      <td>${formatDate(claim['Claim Date'])}<br><small>${escapeHtml(claim['Claim ID'] || '')}</small></td>
-      <td><strong>${escapeHtml(claim.Plate || '-')}</strong><br><small>${escapeHtml(claim['Driver Name'] || '')} · ${escapeHtml(claim['Sales Name'] || '-')}</small></td>
-      <td>${formatter.format(claim['Odometer Km'] || 0)}<br><small>รอบนี้ ${km(claim['Distance Km'])}</small></td>
-      <td><strong>${money(claim.Amount)}</strong><br><small>${costPerKm ? money(costPerKm.toFixed(2)) + '/กม.' : '-'}</small></td>
-      <td>${km(claim['Next Claim Distance Km'])}</td>
-      <td><div class="doc-links">${docs || 'ยังไม่แนบ'}</div></td>
-      <td><span class="badge${warn}">${escapeHtml(claim['Payment Status'] || '-')}</span></td>
-      <td><small>${escapeHtml(claim.Note || '-')}</small></td>
-      <td><div class="action-buttons"><button class="mini-btn" data-action="edit" data-id="${escapeHtml(claim['Claim ID'])}">แก้ไข</button><button class="mini-btn danger" data-action="delete" data-id="${escapeHtml(claim['Claim ID'])}">ลบ</button></div></td>
-    </tr>`;
-  }).join('') : '<tr><td colspan="9" class="empty-state">ไม่พบประวัติตามเงื่อนไขที่เลือก</td></tr>';
-}
+function reportData(){const month=$("#reportMonth").value,car=$("#reportCar").value,match=x=>car==="all"||x["Car ID"]===car;return {month,claims:state.claims.filter(c=>monthKey(c["Claim Date"])===month&&match(c)),maintenance:state.maintenance.filter(m=>monthKey(m.Date)===month&&match(m))};}
+function renderReport(){const {month,claims,maintenance}=reportData(),s=summarize(claims),service=maintenance.reduce((a,x)=>a+Number(x.Cost||0),0);$("#reportSummary").innerHTML=metric("เดือนที่เลือก",formatMonth(month),`${claims.length} รายการ`)+metric("ยอดน้ำมัน",money(s.amount),km(s.distance))+metric("เฉลี่ย/กม.",s.distance?`${money(s.amount/s.distance)}/กม.`:"-","")+metric("ค่าซ่อม",money(service),`${maintenance.length} รายการ`);const ids=[...new Set([...claims.map(x=>x["Car ID"]),...maintenance.map(x=>x["Car ID"])])];$("#reportByCar").innerHTML=ids.map(id=>{const c=getCar(id)||{},cs=summarize(claims.filter(x=>x["Car ID"]===id)),ms=maintenance.filter(x=>x["Car ID"]===id).reduce((a,x)=>a+Number(x.Cost||0),0);return `<article class="report-card"><div><strong>${escapeHtml(c.Plate||id||"-")}</strong><small>${escapeHtml(c.Model||"")}</small></div><div><small>น้ำมัน</small><strong>${money(cs.amount)}</strong></div><div><small>ระยะทาง</small><strong>${km(cs.distance)}</strong></div><div><small>ซ่อม</small><strong>${money(ms)}</strong></div></article>`;}).join("")||'<p class="empty">ยังไม่มีข้อมูล</p>';const rows=[...claims.map(x=>({date:x["Claim Date"],type:"เบิกน้ำมัน",car:x.Plate,detail:`${x["Sales Name"]||"-"} / ${x["Payment Status"]||"-"}`,distance:x["Distance Km"],amount:x.Amount})),...maintenance.map(x=>({date:x.Date,type:"ซ่อมบำรุง",car:x.Plate,detail:`${x.Title||"-"} / ${x.Shop||"-"}`,distance:"",amount:x.Cost}))].sort((a,b)=>dateTime(b.date)-dateTime(a.date));$("#reportDetailRows").innerHTML=rows.length?rows.map(r=>`<tr><td>${formatDate(r.date)}</td><td>${r.type}</td><td>${escapeHtml(r.car||"-")}</td><td>${escapeHtml(r.detail)}</td><td>${r.distance?km(r.distance):"-"}</td><td><strong>${money(r.amount)}</strong></td></tr>`).join(""):'<tr><td colspan="6" class="empty">ยังไม่มีข้อมูล</td></tr>';}
+function metric(label,value,sub){return `<article class="metric"><span>${escapeHtml(label)}</span><strong>${escapeHtml(value)}</strong><small>${escapeHtml(sub)}</small></article>`;}
 
-function updateHistoryFilterVisibility() {
-  const period = document.querySelector('#historyPeriod')?.value || 'week';
-  document.querySelector('#historyMonthWrap')?.classList.toggle('is-hidden', period !== 'month');
-  document.querySelector('#historyRangeWrap')?.classList.toggle('is-hidden', period !== 'custom');
-}
+function renderCalendar(){const grid=$("#calendarGrid"),month=$("#calendarMonth").value,car=$("#calendarCar").value,[year,mon]=month.split("-").map(Number);if(!year||!mon)return;const include=x=>car==="all"||x["Car ID"]===car,events={};state.claims.filter(x=>monthKey(x["Claim Date"])===month&&include(x)).forEach(x=>(events[parseDate(x["Claim Date"]).getDate()]??=[]).push({type:"fuel",title:x.Plate||"-",meta:`${money(x.Amount)} · ${km(x["Distance Km"])}`}));state.maintenance.filter(x=>monthKey(x.Date)===month&&include(x)).forEach(x=>(events[parseDate(x.Date).getDate()]??=[]).push({type:"service",title:x.Plate||"-",meta:`${x.Title||"-"} · ${money(x.Cost)}`}));const headers=["อา","จ","อ","พ","พฤ","ศ","ส"].map(x=>`<div class="weekday">${x}</div>`).join(""),blanks=Array.from({length:new Date(year,mon-1,1).getDay()},()=>'<div class="day blank"></div>').join(""),days=Array.from({length:new Date(year,mon,0).getDate()},(_,i)=>{const d=i+1;return `<div class="day"><strong>${d}</strong>${(events[d]||[]).map(e=>`<span class="event ${e.type}"><b>${escapeHtml(e.title)}</b><br>${escapeHtml(e.meta)}</span>`).join("")}</div>`;}).join("");grid.innerHTML=headers+blanks+days;const total=Object.values(events).reduce((s,x)=>s+x.length,0);$("#calendarSummary").innerHTML=`<strong>${formatMonth(month)}</strong><span>${total} รายการ</span>`;}
 
-function getFilteredHistoryRows() {
-  const carId = document.querySelector('#historyCar')?.value || 'all';
-  const period = document.querySelector('#historyPeriod')?.value || 'week';
-  const search = (document.querySelector('#historySearch')?.value || '').trim().toLowerCase();
-  let rows = [...state.claims];
-  if (carId !== 'all') rows = rows.filter((claim) => claim['Car ID'] === carId);
-  if (period === 'week') rows = rows.filter((claim) => inPeriod(claim, 'week'));
-  if (period === 'month') {
-    const month = document.querySelector('#historyMonth')?.value || monthKey(new Date());
-    rows = rows.filter((claim) => monthKey(claim['Claim Date']) === month);
-  }
-  if (period === 'custom') {
-    const start = document.querySelector('#historyStart')?.value;
-    const end = document.querySelector('#historyEnd')?.value;
-    rows = rows.filter((claim) => inDateRange(claim['Claim Date'], start, end));
-  }
-  if (search) {
-    rows = rows.filter((claim) => [
-      claim['Claim ID'], claim['Sales Name'], claim.Plate, claim['Driver Name'],
-      claim['Payment Status'], claim.Note, claim.Amount, claim['Odometer Km'], claim['Distance Km']
-    ].some((value) => String(value || '').toLowerCase().includes(search)));
-  }
-  return rows.sort((a, b) => dateTime(b['Claim Date']) - dateTime(a['Claim Date']) || dateTime(b['Created At']) - dateTime(a['Created At']));
-}
+function renderMaintenance(){$("#maintenanceList").innerHTML=state.maintenance.length?state.maintenance.map(x=>{const docs=[docLink(x["Receipt URL"],"ใบเสร็จ"),docLink(x["Photo URL"],"รูปงานซ่อม"),docLink(x["Document URL"],"เอกสาร")].filter(Boolean).join("");return `<article class="maintenance-card"><span class="badge">${formatDate(x.Date)}</span><strong>${escapeHtml(x.Title||"-")}</strong><small>${escapeHtml(x.Plate||"-")} · ${escapeHtml(x.Shop||"-")}</small><p>ค่าใช้จ่าย ${money(x.Cost)} · รอบถัดไป ${escapeHtml(x["Next Service"]||"-")}</p><div class="doc-links">${docs||"ยังไม่แนบเอกสาร"}</div></article>`;}).join(""):'<p class="empty">ยังไม่มีประวัติซ่อมบำรุง</p>';}
+function renderCars(){$("#carCards").innerHTML=state.cars.length?state.cars.map(c=>`<article class="car-card"><div class="car-image">${c["Car Photo URL"]?`<img src="${escapeAttr(c["Car Photo URL"])}" alt="รูปรถ">`:""}</div><div><strong>${escapeHtml(c.Plate||"-")} · ${escapeHtml(c.Model||"")}</strong><p class="muted">สี ${escapeHtml(c.Color||"-")} · ${escapeHtml(c["Driver Name"]||"-")}</p><span class="badge${c.Status==="ใช้งาน"?"":" warn"}">${escapeHtml(c.Status||"-")}</span><div class="row-actions" style="margin-top:8px"><button class="btn ghost small" data-action="edit-car" data-id="${escapeAttr(c["Car ID"])}">แก้ไข</button><button class="btn danger small" data-action="delete-car" data-id="${escapeAttr(c["Car ID"])}">ลบ</button></div></div></article>`).join(""):'<p class="empty">ยังไม่มีรถ</p>';}
+function renderDrivers(){$("#driverList").innerHTML=state.drivers.length?state.drivers.map(d=>`<article class="driver-card"><strong>${escapeHtml(d["Driver Name"]||"-")}</strong><small>${escapeHtml(d.Phone||"-")} · ${escapeHtml(d.Area||"-")}</small><p>ใบขับขี่ ${escapeHtml(d["License No"]||"-")}</p><div class="row-actions"><button class="btn ghost small" data-action="edit-driver" data-id="${escapeAttr(d["Driver ID"])}">แก้ไข</button><button class="btn danger small" data-action="delete-driver" data-id="${escapeAttr(d["Driver ID"])}">ลบ</button></div></article>`).join(""):'<p class="empty">ยังไม่มีคนขับ</p>';}
 
-function renderBudgetDashboard() {
-  const container = document.querySelector('#budgetDashboard');
-  if (!container) return;
-  const budget = getBudgetForSelectedCar();
-  const weeklyLimit = Number(budget.weeklyBudgetLimit || 0);
-  const monthlyLimit = Number(budget.monthlyBudgetLimit || 0);
-  const claims = selectedClaims();
-  const weekSpent = claims.filter((claim) => inPeriod(claim, 'week')).reduce((sum, claim) => sum + Number(claim.Amount || 0), 0);
-  const monthSpent = claims.filter((claim) => inPeriod(claim, 'month')).reduce((sum, claim) => sum + Number(claim.Amount || 0), 0);
-  container.innerHTML = [
-    budgetCard('รายสัปดาห์', weeklyLimit, weekSpent),
-    budgetCard('รายเดือน', monthlyLimit, monthSpent)
-  ].join('');
-  const warnings = getBudgetWarnings();
-  const alert = document.querySelector('#budgetAlert');
-  if (alert) {
-    alert.className = `budget-alert${warnings.length ? ' show' : ''}`;
-    alert.innerHTML = warnings.length
-      ? `<strong>เกินวงเงิน ${warnings.length} รายการ</strong><span>${warnings.map((item) => `${item.label} เกิน ${money(Math.abs(item.remaining))}`).join(' · ')}</span>`
-      : '';
-  }
-}
+function exportHistory(type){const rows=filteredHistory();if(!rows.length)return showNotice("ไม่มีข้อมูลสำหรับส่งออก","error");exportRows(rows,[{label:"วันที่",get:x=>dateKey(x["Claim Date"])},{label:"Claim ID",get:x=>x["Claim ID"]},{label:"เซลล์",get:x=>x["Sales Name"]},{label:"ทะเบียน",get:x=>x.Plate},{label:"คนขับ",get:x=>x["Driver Name"]},{label:"เลขไมล์",get:x=>x["Odometer Km"]},{label:"ระยะทาง",get:x=>x["Distance Km"]},{label:"จำนวนเงิน",get:x=>x.Amount},{label:"สถานะ",get:x=>x["Payment Status"]},{label:"หมายเหตุ",get:x=>x.Note}],`fuel-history-${dateKey(new Date())}`,type);}
+function exportReport(type){const {month,claims,maintenance}=reportData(),rows=[...claims.map(x=>({kind:"เบิกน้ำมัน",date:dateKey(x["Claim Date"]),plate:x.Plate,title:x["Sales Name"],distance:x["Distance Km"],amount:x.Amount,status:x["Payment Status"],note:x.Note})),...maintenance.map(x=>({kind:"ซ่อมบำรุง",date:dateKey(x.Date),plate:x.Plate,title:x.Title,distance:"",amount:x.Cost,status:x.Shop,note:x.Note}))];if(!rows.length)return showNotice("ไม่มีข้อมูลสำหรับส่งออก","error");exportRows(rows,[{label:"ประเภท",get:x=>x.kind},{label:"วันที่",get:x=>x.date},{label:"ทะเบียน",get:x=>x.plate},{label:"รายละเอียด",get:x=>x.title},{label:"ระยะทาง",get:x=>x.distance},{label:"จำนวนเงิน",get:x=>x.amount},{label:"สถานะ/ร้าน",get:x=>x.status},{label:"หมายเหตุ",get:x=>x.note}],`monthly-report-${month}`,type);}
+function exportRows(rows,columns,name,type){if(type==="excel"){const html=`<!doctype html><meta charset="utf-8"><table border="1"><thead><tr>${columns.map(c=>`<th>${escapeHtml(c.label)}</th>`).join("")}</tr></thead><tbody>${rows.map(r=>`<tr>${columns.map(c=>`<td>${escapeHtml(c.get(r)??"")}</td>`).join("")}</tr>`).join("")}</tbody></table>`;download(`${name}.xls`,"\ufeff"+html,"application/vnd.ms-excel;charset=utf-8");}else{const csv=[columns.map(c=>csvCell(c.label)).join(","),...rows.map(r=>columns.map(c=>csvCell(c.get(r))).join(","))].join("\n");download(`${name}.csv`,"\ufeff"+csv,"text/csv;charset=utf-8");}}
+function download(name,content,type){const url=URL.createObjectURL(new Blob([content],{type})),a=document.createElement("a");a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url);showNotice(`ดาวน์โหลด ${name} แล้ว`,"ok");}
+function csvCell(value){const t=String(value??"").replace(/\r?\n/g," ");return /[",]/.test(t)?`"${t.replace(/"/g,'""')}"`:t;}
 
-function getBudgetForSelectedCar() {
-  const selected = document.querySelector('#carFilter').value || 'all';
-  const budgets = state.settings?.budgetsByCar || {};
-  return budgets[selected] || budgets.all || {
-    weeklyBudgetLimit: state.settings?.weeklyBudgetLimit || 0,
-    monthlyBudgetLimit: state.settings?.monthlyBudgetLimit || 0
-  };
-}
-
-function budgetCard(label, limit, spent) {
-  const remaining = limit ? limit - spent : 0;
-  const percent = limit ? Math.min(100, Math.round((spent / limit) * 100)) : 0;
-  const status = limit && remaining < 0 ? 'เกินวงเงิน' : 'คงเหลือ';
-  return `<article class="budget-card${remaining < 0 ? ' over-limit' : ''}">
-    <div>
-      <span>${label}</span>
-      <strong>${limit ? money(limit) : 'ยังไม่ตั้งวงเงิน'}</strong>
-    </div>
-    <div class="budget-progress"><span style="width:${percent}%"></span></div>
-    <div class="budget-values">
-      <div><small>เบิกไปแล้ว</small><strong>${money(spent)}</strong></div>
-      <div><small>${status}</small><strong class="${remaining < 0 ? 'over' : ''}">${limit ? money(remaining) : '-'}</strong></div>
-    </div>
-  </article>`;
-}
-
-function getBudgetWarnings() {
-  const budget = getBudgetForSelectedCar();
-  const claims = selectedClaims();
-  const checks = [
-    { label: 'รายสัปดาห์', limit: Number(budget.weeklyBudgetLimit || 0), spent: claims.filter((claim) => inPeriod(claim, 'week')).reduce((sum, claim) => sum + Number(claim.Amount || 0), 0) },
-    { label: 'รายเดือน', limit: Number(budget.monthlyBudgetLimit || 0), spent: claims.filter((claim) => inPeriod(claim, 'month')).reduce((sum, claim) => sum + Number(claim.Amount || 0), 0) }
-  ];
-  return checks
-    .map((item) => ({ ...item, remaining: item.limit - item.spent }))
-    .filter((item) => item.limit && item.remaining < 0);
-}
-
-function renderSingleCarDashboard() {
-  const selected = document.querySelector('#carFilter').value;
-  const container = document.querySelector('#singleCarDashboard');
-  if (!container) return;
-  if (selected === 'all') {
-    container.innerHTML = state.cars.map((car) => {
-      const rows = state.claims.filter((claim) => claim['Car ID'] === car['Car ID']);
-      const totalKm = rows.reduce((sum, claim) => sum + Number(claim['Distance Km'] || 0), 0);
-      const totalAmount = rows.reduce((sum, claim) => sum + Number(claim.Amount || 0), 0);
-      const latest = rows[0];
-      return `<article class="single-car-card">
-        <div><strong>${car.Plate} · ${car.Model}</strong><small>${car['Driver Name'] || '-'} / ${car['Sales Name'] || '-'}</small></div>
-        <div><small>ยอดรวม</small><strong>${money(totalAmount)}</strong></div>
-        <div><small>ระยะทางรวม</small><strong>${km(totalKm)}</strong></div>
-        <div><small>เบิกล่าสุด</small><strong>${latest ? formatDate(latest['Claim Date']) : '-'}</strong></div>
-      </article>`;
-    }).join('');
-    return;
-  }
-  const car = getCar(selected);
-  const rows = state.claims.filter((claim) => claim['Car ID'] === selected);
-  const totalKm = rows.reduce((sum, claim) => sum + Number(claim['Distance Km'] || 0), 0);
-  const totalAmount = rows.reduce((sum, claim) => sum + Number(claim.Amount || 0), 0);
-  const avg = totalKm ? Math.round(totalAmount / totalKm) : 0;
-  const timeline = rows.map((claim) => {
-    const width = Math.min(100, Math.max(8, Math.round((Number(claim['Distance Km'] || 0) / Math.max(totalKm, 1)) * 100)));
-    return `<article class="claim-timeline-row">
-      <div><strong>${formatDate(claim['Claim Date'])}</strong><small>เลขไมล์ ${formatter.format(claim['Odometer Km'] || 0)} · รอบถัดไป ${km(claim['Next Claim Distance Km'])}</small></div>
-      <div class="distance-bar"><span style="width:${width}%"></span></div>
-      <div class="timeline-values"><strong>${km(claim['Distance Km'])}</strong><small>${money(claim.Amount)}</small></div>
-    </article>`;
-  }).join('');
-  container.innerHTML = `<div class="single-car-head">
-    <div><span class="badge">รถที่เลือก</span><h3>${car ? `${car.Plate} · ${car.Model}` : '-'}</h3><p>${car ? `คนขับ ${car['Driver Name'] || '-'} · เซลล์ ${car['Sales Name'] || '-'}` : ''}</p></div>
-    <div class="single-car-stats">
-      <div><small>ยอดเบิกทั้งหมด</small><strong>${money(totalAmount)}</strong></div>
-      <div><small>ระยะทางทั้งหมด</small><strong>${km(totalKm)}</strong></div>
-      <div><small>เฉลี่ย/กม.</small><strong>${money(avg)}</strong></div>
-    </div>
-  </div><div class="claim-timeline">${timeline || '<p>ยังไม่มีประวัติการเบิกของรถคันนี้</p>'}</div>`;
-}
-
-function renderMaintenance() {
-  document.querySelector('#maintenanceList').innerHTML = state.maintenance.map((item) => {
-    const docs = [
-      docLink(item['Receipt URL'], 'ใบเสร็จซ่อม'),
-      docLink(item['Photo URL'], 'รูปงานซ่อม'),
-      docLink(item['Document URL'], 'เอกสารเพิ่มเติม')
-    ].filter(Boolean).join('');
-    return `<article class="maintenance-item"><span class="badge">${formatDate(item.Date)}</span><strong>${escapeHtml(item.Title)}</strong><small>${escapeHtml(item.Plate || '-')} / ${escapeHtml(item.Shop || '-')}</small><p>ค่าใช้จ่าย ${money(item.Cost)} · รอบถัดไป ${escapeHtml(item['Next Service'] || '-')}</p><div class="doc-links">${docs || 'ยังไม่แนบเอกสาร'}</div></article>`;
-  }).join('');
-}
-
-function renderCars() {
-  document.querySelector('#carCards').innerHTML = state.cars.map((car) => `<article class="car-card"><div class="car-image">${car['Car Photo URL'] ? `<img src="${escapeAttr(car['Car Photo URL'])}" alt="">` : ''}</div><div><strong>${escapeHtml(car.Plate)} · ${escapeHtml(car.Model)}</strong><p>สี${escapeHtml(car.Color || '-')} · เซลล์ ${escapeHtml(car['Sales Name'] || '-')}</p><span class="badge${car.Status === 'ใช้งาน' ? '' : ' warn'}">${escapeHtml(car.Status || '-')}</span><div class="action-buttons"><button class="mini-btn" data-action="edit-car" data-id="${escapeHtml(car['Car ID'])}">แก้ไข</button><button class="mini-btn danger" data-action="delete-car" data-id="${escapeHtml(car['Car ID'])}">ลบ</button></div></div></article>`).join('');
-}
-
-function renderDrivers() {
-  document.querySelector('#driverList').innerHTML = state.drivers.map((driver) => `<article class="driver-item"><strong>${escapeHtml(driver['Driver Name'])}</strong><small>${escapeHtml(driver.Phone || '-')}</small><p>${escapeHtml(driver.Area || '-')} · ใบขับขี่ ${escapeHtml(driver['License No'] || '-')}</p><div class="action-buttons"><button class="mini-btn" data-action="edit-driver" data-id="${escapeHtml(driver['Driver ID'])}">แก้ไข</button><button class="mini-btn danger" data-action="delete-driver" data-id="${escapeHtml(driver['Driver ID'])}">ลบ</button></div></article>`).join('');
-}
-
-function renderMonthlyReport() {
-  const summaryEl = document.querySelector('#reportSummary');
-  if (!summaryEl) return;
-  const { claims, maintenance, monthLabel } = getMonthlyReportData();
-  const claimSummary = summarizeClaims(claims);
-  const maintenanceCost = maintenance.reduce((sum, item) => sum + Number(item.Cost || 0), 0);
-  summaryEl.innerHTML = [
-    reportMetric('เดือนที่เลือก', monthLabel, `${formatter.format(claims.length)} รายการเบิก`),
-    reportMetric('ยอดเบิกน้ำมัน', money(claimSummary.amount), km(claimSummary.distance)),
-    reportMetric('ค่าเฉลี่ย/กม.', claimSummary.distance ? `${money(claimSummary.amount / claimSummary.distance)}/กม.` : '-', 'อิงจากรายการที่กรอง'),
-    reportMetric('ค่าซ่อมบำรุง', money(maintenanceCost), `${formatter.format(maintenance.length)} รายการ`)
-  ].join('');
-
-  const carIds = [...new Set([...claims.map((claim) => claim['Car ID']), ...maintenance.map((item) => item['Car ID'])])];
-  document.querySelector('#reportByCar').innerHTML = carIds.length ? carIds.map((carId) => {
-    const car = getCar(carId) || {};
-    const carClaims = claims.filter((claim) => claim['Car ID'] === carId);
-    const carMaintenance = maintenance.filter((item) => item['Car ID'] === carId);
-    const carSummary = summarizeClaims(carClaims);
-    const serviceCost = carMaintenance.reduce((sum, item) => sum + Number(item.Cost || 0), 0);
-    return `<article class="report-card">
-      <div><strong>${escapeHtml(car.Plate || carClaims[0]?.Plate || carMaintenance[0]?.Plate || '-')}</strong><small>${escapeHtml(car.Model || '')}</small></div>
-      <div><small>ยอดเบิก</small><strong>${money(carSummary.amount)}</strong></div>
-      <div><small>ระยะทาง</small><strong>${km(carSummary.distance)}</strong></div>
-      <div><small>ซ่อมบำรุง</small><strong>${money(serviceCost)}</strong></div>
-    </article>`;
-  }).join('') : '<p class="empty-state">ยังไม่มีข้อมูลในเดือนนี้</p>';
-
-  const detailRows = [
-    ...claims.map((claim) => ({ date: claim['Claim Date'], type: 'เบิกน้ำมัน', car: claim.Plate, detail: `${claim['Sales Name'] || '-'} / ${claim['Payment Status'] || '-'}`, distance: claim['Distance Km'], amount: claim.Amount, docs: [claim['Odometer Photo URL'], claim['Receipt URL'], claim['Transfer Slip URL']].filter(Boolean).length })),
-    ...maintenance.map((item) => ({ date: item.Date, type: 'ซ่อมบำรุง', car: item.Plate, detail: `${item.Title || '-'} / ${item.Shop || '-'}`, distance: '', amount: item.Cost, docs: [item['Receipt URL'], item['Photo URL'], item['Document URL']].filter(Boolean).length }))
-  ].sort((a, b) => dateTime(b.date) - dateTime(a.date));
-  document.querySelector('#reportDetailRows').innerHTML = detailRows.length ? detailRows.map((row) => `<tr><td>${formatDate(row.date)}</td><td>${escapeHtml(row.type)}</td><td>${escapeHtml(row.car || '-')}</td><td>${escapeHtml(row.detail)}</td><td>${row.distance ? km(row.distance) : '-'}</td><td><strong>${money(row.amount)}</strong></td><td>${row.docs || 0} ไฟล์</td></tr>`).join('') : '<tr><td colspan="7" class="empty-state">ยังไม่มีข้อมูลในเดือนนี้</td></tr>';
-}
-
-function reportMetric(label, value, subtext) {
-  return `<article class="metric compact"><span>${escapeHtml(label)}</span><strong>${escapeHtml(value)}</strong><small>${escapeHtml(subtext || '')}</small></article>`;
-}
-
-function getMonthlyReportData() {
-  const month = document.querySelector('#reportMonth')?.value || monthKey(new Date());
-  const carId = document.querySelector('#reportCar')?.value || 'all';
-  const filterCar = (item) => carId === 'all' || item['Car ID'] === carId;
-  return {
-    month,
-    monthLabel: formatMonth(month),
-    claims: state.claims.filter((claim) => monthKey(claim['Claim Date']) === month && filterCar(claim)),
-    maintenance: state.maintenance.filter((item) => monthKey(item.Date) === month && filterCar(item))
-  };
-}
-
-function renderCalendar() {
-  const grid = document.querySelector('#calendarGrid');
-  if (!grid) return;
-  const month = document.querySelector('#calendarMonth')?.value || monthKey(new Date());
-  const carId = document.querySelector('#calendarCar')?.value || 'all';
-  const [year, monthNumber] = month.split('-').map(Number);
-  const firstDay = new Date(year, monthNumber - 1, 1);
-  const daysInMonth = new Date(year, monthNumber, 0).getDate();
-  const eventsByDay = {};
-  const includeCar = (item) => carId === 'all' || item['Car ID'] === carId;
-  state.claims.filter((claim) => monthKey(claim['Claim Date']) === month && includeCar(claim)).forEach((claim) => {
-    const day = parseDate(claim['Claim Date']).getDate();
-    if (!eventsByDay[day]) eventsByDay[day] = [];
-    eventsByDay[day].push({ type: 'fuel', title: claim.Plate || '-', meta: `${money(claim.Amount)} · ${km(claim['Distance Km'])}` });
-  });
-  state.maintenance.filter((item) => monthKey(item.Date) === month && includeCar(item)).forEach((item) => {
-    const day = parseDate(item.Date).getDate();
-    if (!eventsByDay[day]) eventsByDay[day] = [];
-    eventsByDay[day].push({ type: 'service', title: item.Plate || '-', meta: `${item.Title || '-'} · ${money(item.Cost)}` });
-  });
-  const headers = ['อา', 'จ', 'อ', 'พ', 'พฤ', 'ศ', 'ส'].map((day) => `<div class="calendar-weekday">${day}</div>`).join('');
-  const blanks = Array.from({ length: firstDay.getDay() }, () => '<div class="calendar-day muted"></div>').join('');
-  const days = Array.from({ length: daysInMonth }, (_, index) => {
-    const day = index + 1;
-    const events = eventsByDay[day] || [];
-    return `<div class="calendar-day"><strong>${day}</strong>${events.map((event) => `<span class="calendar-event ${event.type}"><b>${escapeHtml(event.title)}</b>${escapeHtml(event.meta)}</span>`).join('')}</div>`;
-  }).join('');
-  grid.innerHTML = headers + blanks + days;
-  const totalEvents = Object.values(eventsByDay).reduce((sum, events) => sum + events.length, 0);
-  document.querySelector('#calendarSummary').innerHTML = `<strong>${formatMonth(month)}</strong><span>${formatter.format(totalEvents)} รายการในปฏิทิน</span>`;
-}
-
-function exportHistory(type) {
-  const rows = getFilteredHistoryRows();
-  if (!rows.length) return showNotice('ไม่มีข้อมูลประวัติสำหรับ Export', 'error');
-  exportRows(rows, historyColumns(), `fuel-history-${dateKey(new Date())}`, type);
-}
-
-function exportMonthlyReport(type) {
-  const { claims, maintenance, month } = getMonthlyReportData();
-  const rows = [
-    ...claims.map((claim) => ({ kind: 'เบิกน้ำมัน', date: claim['Claim Date'], plate: claim.Plate, title: claim['Sales Name'], distance: claim['Distance Km'], amount: claim.Amount, status: claim['Payment Status'], note: claim.Note })),
-    ...maintenance.map((item) => ({ kind: 'ซ่อมบำรุง', date: item.Date, plate: item.Plate, title: item.Title, distance: '', amount: item.Cost, status: item.Shop, note: item.Note }))
-  ].sort((a, b) => dateTime(b.date) - dateTime(a.date));
-  if (!rows.length) return showNotice('ไม่มีข้อมูลรายงานสำหรับ Export', 'error');
-  exportRows(rows, [
-    { label: 'ประเภท', value: (row) => row.kind },
-    { label: 'วันที่', value: (row) => formatDate(row.date) },
-    { label: 'รถ', value: (row) => row.plate },
-    { label: 'รายละเอียด', value: (row) => row.title },
-    { label: 'ระยะทาง', value: (row) => row.distance || '' },
-    { label: 'จำนวนเงิน', value: (row) => row.amount || 0 },
-    { label: 'สถานะ/ร้าน', value: (row) => row.status },
-    { label: 'หมายเหตุ', value: (row) => row.note }
-  ], `monthly-report-${month}`, type);
-}
-
-function historyColumns() {
-  return [
-    { label: 'วันที่', value: (claim) => formatDate(claim['Claim Date']) },
-    { label: 'Claim ID', value: (claim) => claim['Claim ID'] },
-    { label: 'เซลล์', value: (claim) => claim['Sales Name'] },
-    { label: 'ทะเบียน', value: (claim) => claim.Plate },
-    { label: 'คนขับ', value: (claim) => claim['Driver Name'] },
-    { label: 'เลขไมล์', value: (claim) => claim['Odometer Km'] },
-    { label: 'ระยะทาง', value: (claim) => claim['Distance Km'] },
-    { label: 'จำนวนเงิน', value: (claim) => claim.Amount },
-    { label: 'รอบถัดไป', value: (claim) => claim['Next Claim Distance Km'] },
-    { label: 'สถานะ', value: (claim) => claim['Payment Status'] },
-    { label: 'หมายเหตุ', value: (claim) => claim.Note }
-  ];
-}
-
-function exportRows(rows, columns, fileName, type) {
-  if (type === 'excel') {
-    const tableRows = rows.map((row) => `<tr>${columns.map((column) => `<td>${escapeHtml(column.value(row) ?? '')}</td>`).join('')}</tr>`).join('');
-    const header = columns.map((column) => `<th>${escapeHtml(column.label)}</th>`).join('');
-    const html = `<!doctype html><html><head><meta charset="UTF-8"></head><body><table border="1"><thead><tr>${header}</tr></thead><tbody>${tableRows}</tbody></table></body></html>`;
-    downloadFile(`${fileName}.xls`, '\ufeff' + html, 'application/vnd.ms-excel;charset=utf-8');
-    return;
-  }
-  const csv = [
-    columns.map((column) => csvCell(column.label)).join(','),
-    ...rows.map((row) => columns.map((column) => csvCell(column.value(row))).join(','))
-  ].join('\n');
-  downloadFile(`${fileName}.csv`, '\ufeff' + csv, 'text/csv;charset=utf-8');
-}
-
-function downloadFile(fileName, content, type) {
-  const blob = new Blob([content], { type });
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement('a');
-  link.href = url;
-  link.download = fileName;
-  document.body.appendChild(link);
-  link.click();
-  link.remove();
-  URL.revokeObjectURL(url);
-  showNotice(`Export ไฟล์ ${fileName} แล้ว`, 'ok');
-  setTimeout(clearNotice, 1600);
-}
-
-function csvCell(value) {
-  const text = String(value ?? '').replace(/\r?\n/g, ' ');
-  return /[",]/.test(text) ? `"${text.replace(/"/g, '""')}"` : text;
-}
-
-function summarizeClaims(rows) {
-  return {
-    amount: rows.reduce((sum, claim) => sum + Number(claim.Amount || 0), 0),
-    distance: rows.reduce((sum, claim) => sum + Number(claim['Distance Km'] || 0), 0)
-  };
-}
-
-function normalizeState(data = {}) {
-  const settings = data.settings || {};
-  const budgetsByCar = settings.budgetsByCar || {
-    all: {
-      weeklyBudgetLimit: Number(settings.weeklyBudgetLimit || 0),
-      monthlyBudgetLimit: Number(settings.monthlyBudgetLimit || 0)
-    }
-  };
-  return {
-    cars: Array.isArray(data.cars) ? data.cars : [],
-    drivers: Array.isArray(data.drivers) ? data.drivers : [],
-    claims: (Array.isArray(data.claims) ? data.claims : []).sort((a, b) => dateTime(b['Claim Date']) - dateTime(a['Claim Date']) || dateTime(b['Created At']) - dateTime(a['Created At'])),
-    maintenance: (Array.isArray(data.maintenance) ? data.maintenance : []).sort((a, b) => dateTime(b.Date) - dateTime(a.Date)),
-    settings: { weeklyBudgetLimit: 0, monthlyBudgetLimit: 0, ...settings, budgetsByCar }
-  };
-}
-
-function docLink(url, label) {
-  return url ? `<a href="${escapeAttr(url)}" target="_blank" rel="noopener">${escapeHtml(label)}</a>` : '';
-}
-
-function formatDate(value) {
-  if (!value) return '-';
-  const date = parseDate(value);
-  return Number.isNaN(date.getTime()) ? value : date.toLocaleDateString('th-TH');
-}
-
-function toInputDate(value) {
-  if (!value) return '';
-  const date = parseDate(value);
-  if (Number.isNaN(date.getTime())) return String(value).slice(0, 10);
-  return dateKey(date);
-}
-
-function parseDate(value) {
-  if (value instanceof Date) return value;
-  if (!value) return new Date(NaN);
-  const text = String(value);
-  const direct = new Date(text);
-  if (!Number.isNaN(direct.getTime())) return direct;
-  const match = text.match(/^(\d{4})-(\d{2})-(\d{2})/);
-  if (match) return new Date(Number(match[1]), Number(match[2]) - 1, Number(match[3]));
-  return new Date(NaN);
-}
-
-function dateTime(value) {
-  const time = parseDate(value).getTime();
-  return Number.isNaN(time) ? 0 : time;
-}
-
-function startOfDay(value) {
-  const date = parseDate(value);
-  return new Date(date.getFullYear(), date.getMonth(), date.getDate());
-}
-
-function getWeekRange(value) {
-  const date = startOfDay(value);
-  const mondayOffset = (date.getDay() + 6) % 7;
-  const start = new Date(date);
-  start.setDate(date.getDate() - mondayOffset);
-  const end = new Date(start);
-  end.setDate(start.getDate() + 6);
-  end.setHours(23, 59, 59, 999);
-  return { start, end };
-}
-
-function inDateRange(value, startValue, endValue) {
-  const time = dateTime(value);
-  const start = startValue ? startOfDay(startValue).getTime() : -Infinity;
-  const endDate = endValue ? startOfDay(endValue) : null;
-  if (endDate) endDate.setHours(23, 59, 59, 999);
-  const end = endDate ? endDate.getTime() : Infinity;
-  return time >= start && time <= end;
-}
-
-function dateKey(value) {
-  const date = parseDate(value);
-  if (Number.isNaN(date.getTime())) return '';
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, '0');
-  const day = String(date.getDate()).padStart(2, '0');
-  return `${year}-${month}-${day}`;
-}
-
-function monthKey(value) {
-  const date = parseDate(value);
-  if (Number.isNaN(date.getTime())) return '';
-  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
-}
-
-function formatMonth(month) {
-  const [year, monthNumber] = String(month || '').split('-').map(Number);
-  if (!year || !monthNumber) return '-';
-  return monthFormatter.format(new Date(year, monthNumber - 1, 1));
-}
-
-function escapeHtml(value) {
-  return String(value ?? '').replace(/[&<>"']/g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[char]));
-}
-
-function escapeAttr(value) {
-  return escapeHtml(value);
-}
-    </script>
-  </body>
+function normalizeState(data={}){return {cars:Array.isArray(data.cars)?data.cars:[],drivers:Array.isArray(data.drivers)?data.drivers:[],claims:(Array.isArray(data.claims)?data.claims:[]).sort(sortNewest),maintenance:(Array.isArray(data.maintenance)?data.maintenance:[]).sort((a,b)=>dateTime(b.Date)-dateTime(a.Date)),settings:normalizeSettings(data.settings||{})};}
+function normalizeSettings(s={}){return {weeklyBudgetLimit:Number(s.weeklyBudgetLimit||0),monthlyBudgetLimit:Number(s.monthlyBudgetLimit||0),...s,budgetsByCar:s.budgetsByCar||{all:{weeklyBudgetLimit:Number(s.weeklyBudgetLimit||0),monthlyBudgetLimit:Number(s.monthlyBudgetLimit||0)}}};}
+function getCar(id){return state.cars.find(c=>String(c["Car ID"])===String(id));}function summarize(rows){return {amount:rows.reduce((s,x)=>s+Number(x.Amount||0),0),distance:rows.reduce((s,x)=>s+Number(x["Distance Km"]||0),0)};}function sortNewest(a,b){return dateTime(b["Claim Date"])-dateTime(a["Claim Date"])||dateTime(b["Created At"])-dateTime(a["Created At"]);}
+function parseDate(value){if(value instanceof Date)return new Date(value);const t=String(value||"");const m=t.match(/^(\d{4})-(\d{2})-(\d{2})/);if(m)return new Date(+m[1],+m[2]-1,+m[3]);return new Date(t);}function dateTime(v){const t=parseDate(v).getTime();return Number.isNaN(t)?0:t;}function dateKey(v){const d=parseDate(v);if(Number.isNaN(d.getTime()))return "";return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;}function monthKey(v){return dateKey(v).slice(0,7);}function formatDate(v){const d=parseDate(v);return Number.isNaN(d.getTime())?"-":d.toLocaleDateString("th-TH");}function formatMonth(v){const [y,m]=String(v||"").split("-").map(Number);return y&&m?new Intl.DateTimeFormat("th-TH",{month:"long",year:"numeric"}).format(new Date(y,m-1,1)):"-";}function weekRange(v){const d=parseDate(v),start=new Date(d.getFullYear(),d.getMonth(),d.getDate());start.setDate(start.getDate()-((start.getDay()+6)%7));const end=new Date(start);end.setDate(end.getDate()+6);end.setHours(23,59,59,999);return {start,end};}function endOfDay(v){const d=parseDate(v);d.setHours(23,59,59,999);return d;}function inRange(v,start,end){const t=dateTime(v),a=start?parseDate(start).getTime():-Infinity,b=end?endOfDay(end).getTime():Infinity;return t>=a&&t<=b;}
+function docLink(url,label){return url?`<a href="${escapeAttr(url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(label)}</a>`:"";}function escapeHtml(v){return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]));}function escapeAttr(v){return escapeHtml(v);}function $(s){return document.querySelector(s);}function showNotice(message,type=""){$("#notice").textContent=message;$("#notice").className=`notice show ${type}`;}function clearNotice(){$("#notice").className="notice";}function setBusy(button,busy){button.disabled=busy;document.querySelectorAll("button[type=submit]").forEach(b=>{if(b===button)b.disabled=busy;});}
+</script>
+</body>
 </html>
-
